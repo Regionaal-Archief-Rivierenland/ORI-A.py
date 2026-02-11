@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config xmlns="http://pypi.org/project/xsdata" version="26.1">
+    <Output maxLineLength="82" genericCollections="false">
+        <Package>generated</Package>
+        <!-- order=... just generates a __lt__(), __le__(), etc. To cite the
+        docs:
+             > These compare the class as if it were a tuple of its fields
+             Cannot see much need for this.
+         -->
+        <Format repr="true" eq="true" order="false" unsafeHash="false"
+            frozen="false" slots="false">dataclasses</Format>
+        <Structure>filenames</Structure>
+        <DocstringStyle>Google</DocstringStyle>
+        <RelativeImports>false</RelativeImports>
+        <CompoundFields defaultName="choice" useSubstitutionGroups="false"
+            forceDefaultName="false" maxNameParts="3">false</CompoundFields>
+        <WrapperFields>false</WrapperFields>
+        <UnnestClasses>false</UnnestClasses>
+        <IgnorePatterns>false</IgnorePatterns>
+        <IncludeHeader>true</IncludeHeader>
+    </Output>
+    <Conventions>
+        <!-- the safePrefix "REMOVE" signals to the postprocessor that the whole
+             prefix mechanism is irrelevant, and that its results should be
+             discarded. There is no way to do this natively. Leaving this out
+             causes xsdata to mess with fields named "type"-->
+        <ClassName case="pascalCase" safePrefix="" />
+        <FieldName case="originalCase" safePrefix="REMOVE" />
+        <ConstantName case="pascalCase" safePrefix="value" />
+        <ModuleName case="originalCase" safePrefix="mod" />
+        <PackageName case="originalCase" safePrefix="pkg" />
+    </Conventions>
+    <Substitutions>
+        <Substitution type="package" search="http://www.w3.org/2001/XMLSchema"
+            replace="xs" />
+        <Substitution type="package"
+            search="http://www.w3.org/XML/1998/namespace" replace="xml" />
+        <Substitution type="package"
+            search="http://www.w3.org/2001/XMLSchema-instance" replace="xsi" />
+        <Substitution type="package" search="http://www.w3.org/1998/Math/MathML"
+            replace="mathml3" />
+        <Substitution type="package" search="http://www.w3.org/1999/xlink"
+            replace="xlink" />
+        <Substitution type="package" search="http://www.w3.org/1999/xhtml"
+            replace="xhtml" />
+        <Substitution type="class" search="OriA" replace="ORI_A" />
+        <Substitution type="module" search="ORIA" replace="ORI_A" />
+        <Substitution type="field" search="(.*)_REMOVE" replace="\1" />
+    </Substitutions>
+    <Extensions />
+</Config>
