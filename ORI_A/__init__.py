@@ -1,4 +1,4 @@
-from ORI_A import (
+from .ORI_A import (
     ORI_A,
     AanwezigeDeelnemerGegevens,
     AgendapuntGegevens,
