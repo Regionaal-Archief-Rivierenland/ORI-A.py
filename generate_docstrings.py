@@ -3,8 +3,18 @@ import xml.etree.ElementTree as ET
 import ORI_A
 import textwrap
 
+from jinja2 import Template
+
 ns = {"xs": "http://www.w3.org/2001/XMLSchema"}
 root = ET.parse("ORI-A.xsd").getroot()
+MAX_WIDTH = 82
+INDENT = 4
+
+with open('ORI_A/ORI_A.template.py') as f:
+    template = Template(f.read())
+
+# dict that stores full class docstrings by lower camelCase class name
+docs = {}
 
 for complex_type in root.findall(".//xs:complexType", namespaces=ns):
     type_name = complex_type.get("name")
@@ -21,13 +31,28 @@ for complex_type in root.findall(".//xs:complexType", namespaces=ns):
     cls = getattr(ORI_A, class_name)
     python_ordered_fields = dataclasses.fields(cls)
 
+    class_docstring = textwrap.fill(
+        complex_type.find("./xs:annotation/xs:documentation", namespaces=ns).text,
+        width=MAX_WIDTH,
+        subsequent_indent=" "*INDENT
+    )
+    class_docstring += f"\n\n{' '*INDENT}Attributes:\n"
+
     for field in python_ordered_fields:
         elem = complex_type.find(f"./xs:sequence/xs:element[@name='{field.name}']", namespaces=ns)
-        elem_docstring = elem.find("./xs:annotation/xs:documentation", namespaces=ns).text
-        elem_docstring = "\n".join(
-            textwrap.wrap(elem_docstring, width=82, subsequent_indent="  ")
+        field_docstring = elem.find("./xs:annotation/xs:documentation", namespaces=ns).text
+        field_docstring = textwrap.fill(
+            f"{field.name}: {field_docstring}",
+            width=MAX_WIDTH,
+            initial_indent=" "*(2*INDENT),
+            subsequent_indent=" "*(2*INDENT+2),
         )
-        print(field.name, elem_docstring)
+        class_docstring += field_docstring + "\n"
 
+    class_docstring += " "*INDENT
+    # print(class_docstring)
+    docs[class_name[0].lower() + class_name[1:]] = class_docstring
 
-    class_docstring = complex_type.find("./xs:annotation/xs:documentation", namespaces=ns)
+with open("ORI_A/ORI_A.py", "w") as f:
+    f.write(template.render(docs=docs))
+
