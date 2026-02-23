@@ -54,7 +54,7 @@ for complex_type in root.findall(".//xs:complexType", namespaces=ns):
                 " | __annotationlib_name_1__", ""
             )
         elif get_origin(field.type) is Union:
-import Ori_A            field_type_name = get_args(field.type)[0].__name__
+            field_type_name = get_args(field.type)[0].__name__
         else:
             field_type_name = field.type.__name__
 
