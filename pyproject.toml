@@ -1,0 +1,28 @@
+[project]
+name = "ORI-A.py"
+version = "0.0.1"
+authors = [
+  { name="Rijnder Wever", email="rwever@rarivierland.nl"},
+]
+license = { file = "LICENSE"}
+description = "Library voor het aanmaken, aanpassen, en controleren van ORI-A XML bestanden"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["ORI-A", "raadsinformatie", "MDTO", "archiving", "Goverment data"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/Regionaal-Archief-Rivierenland/ORI-A.py"
+Issues = "https://github.com/Regionaal-Archief-Rivierenland/ORI-A.py/issues"
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["ORI_A"]
