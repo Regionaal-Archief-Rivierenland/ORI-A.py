@@ -27,8 +27,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install pytest
-        run: pip install pytest
+      - name: Install ORI_A.py and pytest
+        run: pip install . pytest
       
       - name: Run tests
         run: pytest

@@ -16,6 +16,8 @@ classifiers = [
 ]
 
 
+dependencies = ["xsdata"]
+
 [project.urls]
 Homepage = "https://github.com/Regionaal-Archief-Rivierenland/ORI-A.py"
 Issues = "https://github.com/Regionaal-Archief-Rivierenland/ORI-A.py/issues"
