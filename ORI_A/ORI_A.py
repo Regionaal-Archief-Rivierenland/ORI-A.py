@@ -1,3 +1,4 @@
+from __future__ import annotations
 import dataclasses
 
 from dataclasses import Field, dataclass
@@ -681,7 +682,7 @@ class ORI_A(Serializable):
         # while cosmetic, this is obviously super important
         root_elem = ET.Element(root, nsmap={None: "https://ori-a.nl", "xsi": xsi_ns})
         root_elem.set(
-            # don't use a f-string here since the repeated { upsets jinja
+            # avoid f-strings here since double '{' upsets jinja
             "{" + xsi_ns + "}schemaLocation",
             "https://ori-a.nl https://github.com/Regionaal-Archief-Rivierenland/ORI-A-XSD/releases/download/v1.0.0/ORI-A.xsd",
         )
