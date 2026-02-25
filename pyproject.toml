@@ -7,7 +7,7 @@ authors = [
 license = { file = "LICENSE"}
 description = "Library voor het aanmaken, aanpassen, en controleren van ORI-A XML bestanden"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 keywords = ["ORI-A", "raadsinformatie", "MDTO", "archiving", "Goverment data"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -16,7 +16,7 @@ classifiers = [
 ]
 
 
-dependencies = ["xsdata"]
+dependencies = ["xsdata", "lxml"]
 
 [project.urls]
 Homepage = "https://github.com/Regionaal-Archief-Rivierenland/ORI-A.py"
