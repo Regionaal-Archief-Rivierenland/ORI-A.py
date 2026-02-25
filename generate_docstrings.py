@@ -2,6 +2,7 @@
 
 import dataclasses
 import xml.etree.ElementTree as ET
+import sys
 import ORI_A
 import textwrap
 import annotationlib
@@ -12,10 +13,13 @@ from jinja2 import Template
 MAX_WIDTH = 87
 INDENT = 4
 
-ns = {"xs": "http://www.w3.org/2001/XMLSchema"}
-root = ET.parse("ORI-A.xsd").getroot()
+xsdfile = sys.argv[1]
+ori_a_template = sys.argv[2]
 
-with open('ORI_A/ORI_A.template.py') as f:
+ns = {"xs": "http://www.w3.org/2001/XMLSchema"}
+root = ET.parse(xsdfile).getroot()
+
+with open(ori_a_template) as f:
     template = Template(f.read())
 
 # dict that stores full class docstrings by lower camelCase class name
