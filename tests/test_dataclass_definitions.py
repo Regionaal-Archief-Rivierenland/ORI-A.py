@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
-from ORI_A.ORI_A import ORI_A, AgendapuntGegevens, Serializable, VergaderingGegevens
+from ORI_A import ORI_A, AgendapuntGegevens, Serializable, VergaderingGegevens
 
 # TODO: ORI-A has legit instances where a field can take on muliple values 
 
