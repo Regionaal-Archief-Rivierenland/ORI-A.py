@@ -1,5 +1,5 @@
 [project]
-name = "ORI-A.py"
+name = "ORI-A"
 version = "0.0.1"
 authors = [
   { name="Rijnder Wever", email="rwever@rarivierland.nl"},
