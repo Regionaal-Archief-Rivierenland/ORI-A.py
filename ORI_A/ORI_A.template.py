@@ -260,7 +260,7 @@ class VergaderingGegevens(Serializable):
     georganiseerdDoorGremium: GremiumGegevens = None
     locatie: str = None
     weblocatie: str = None
-    status: VergaderingGegevensStatus = None
+    status: VergaderingStatusEnum = None
     overheidsorgaan: BegripGegevens = None
     isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
     isGenotuleerdIn: InformatieobjectGegevens = None
