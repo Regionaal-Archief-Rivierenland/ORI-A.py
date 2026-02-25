@@ -337,7 +337,7 @@ class ORI_A(Serializable):
     stemming: StemmingGegevens | list[StemmingGegevens] = None
     besluit: BesluitGegevens | list[BesluitGegevens] = None
     fractie: FractieGegevens | list[FractieGegevens] = None
-    dagelijksBestuur: list[DagelijksBestuurGegevens] = None
+    dagelijksBestuur: DagelijksBestuurGegevens | list[DagelijksBestuurGegevens] = None
     persoonBuitenVergadering: NatuurlijkPersoonGegevens | list[NatuurlijkPersoonGegevens] = None
     aanwezigeDeelnemer: AanwezigeDeelnemerGegevens | list[AanwezigeDeelnemerGegevens] = None
 
