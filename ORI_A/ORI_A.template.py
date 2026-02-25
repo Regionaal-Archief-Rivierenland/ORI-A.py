@@ -5,6 +5,8 @@ from enum import Enum
 
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
+import lxml.etree as ET
+
 class Serializable:
     @classmethod
     def _ORI_A_ordered_fields(cls) -> list[Field]:
@@ -18,6 +20,42 @@ class Serializable:
         ORI-A XSD allow optional attributes to appear anywhere.
         """
         return dataclasses.fields(cls)
+
+    def to_xml(self, root: str) -> ET.Element:
+        """Serialize ORI-A object to XML.
+
+        Args:
+            root (str): name of the new root tag
+
+        Returns:
+            ET.Element: XML serialization of object with new root tag
+        """
+
+        root_elem = ET.Element(root)
+        # get dataclass fields, but in the order required by the ORI-A XSD
+        fields = self._ORI_A_ordered_fields()
+
+        for field in fields:
+            field_name = field.name
+            field_value = getattr(self, field_name)
+
+            # skip empty fields
+            if field_value is None:
+                continue
+
+            # listify
+            if not isinstance(field_value, (list, tuple, set)):
+                field_value = (field_value,)
+
+            # serialize sequence of primitives and *Gegevens objects
+            for val in field_value:
+                if isinstance(val, Serializable):
+                    root_elem.append(val.to_xml(field_name))
+                else:
+                    # micro-optim: create subelem and .text content in one go
+                    ET.SubElement(root_elem, field_name).text = str(val)
+                    
+        return root_elem
 
 
 @dataclass
@@ -302,6 +340,87 @@ class ORI_A(Serializable):
     dagelijksBestuur: list[DagelijksBestuurGegevens] = None
     persoonBuitenVergadering: NatuurlijkPersoonGegevens | list[NatuurlijkPersoonGegevens] = None
     aanwezigeDeelnemer: AanwezigeDeelnemerGegevens | list[AanwezigeDeelnemerGegevens] = None
+
+    def to_xml(self, root: str) -> ET.Element:
+        """Transform ORI-A object into an XML tree with the following structure:
+
+        ```xml
+        <ORI-A xmlns=…>
+            …
+        </ORI-A>
+        ```
+
+        Note:
+           There is rarely a real reason to use this directly. If you want to
+           write ORI-A XML to a file, look into the `.save()` method.
+
+        Returns:
+            ET.ElementTree: XML seralization of the object
+        """
+
+        xsi_ns = "http://www.w3.org/2001/XMLSchema-instance"
+        root_without_attribs = super().to_xml(root)
+
+        # we have to jump through some weird lxml hoops to get xmlns="https://ori-a.nl" to be first attrib.
+        # while cosmetic, this is obviously super important
+        root_elem = ET.Element(root, nsmap={None: "https://ori-a.nl", "xsi": xsi_ns})
+        root_elem.set(
+            # avoid f-strings here since double '{' upsets jinja
+            "{" + xsi_ns + "}schemaLocation",
+            "https://ori-a.nl https://github.com/Regionaal-Archief-Rivierenland/ORI-A-XSD/releases/download/v1.0.0/ORI-A.xsd",
+        )
+        # copy over children
+        root_elem.extend(root_without_attribs)
+
+        return root_elem
+
+    def save(
+        self,
+        file_or_filename: str | TextIO,
+        minify: bool = False,
+        lxml_kwargs: dict = {},
+    ) -> None:
+        """Save ORI-A object to a XML file.
+
+        The XML is pretty printed by default; use `minify=True` to reverse this.
+
+        Args:
+            file_or_filename (str | TextIO): Path or file-like object to write
+             object's XML representation to
+            minify (Optional[bool]): the reverse of pretty printing; makes the XML
+             as small as possible by removing the XML declaration and any optional
+             whitespace
+            lxml_kwargs (Optional[dict]): optional dict of keyword arguments that
+             can be used to override the args passed to lxml's `write()`.
+
+        Note:
+            For a complete list of arguments of lxml's write method, see
+            https://lxml.de/apidoc/lxml.etree.html#lxml.etree._ElementTree.write
+
+        Raises:
+            ValidationError: ~~Object voilates the ORI-A schema~~ NOT IMPLEMENTED YET 
+        """
+        # lxml wants files in binary mode, so pass along a file's raw byte stream
+        if hasattr(file_or_filename, "write"):
+            file_or_filename = file_or_filename.buffer.raw
+
+        # self.validate()
+        xml = self.to_xml("ORI-A")
+        # lxml's .write wants an ElementTree object
+        tree = ET.ElementTree(xml)
+
+        if not minify:
+            ET.indent(xml, space="    ")
+
+        lxml_defaults = {
+            "xml_declaration": not minify,
+            "pretty_print": not minify,
+            "encoding": "UTF-8",
+        }
+
+        # `|` is a union operator; it merges two dicts, with right-hand side taking precedence
+        tree.write(file_or_filename, **(lxml_defaults | lxml_kwargs))
+
 
 
 # TODO: generate docstrings for these as well (just a list of options is good)
