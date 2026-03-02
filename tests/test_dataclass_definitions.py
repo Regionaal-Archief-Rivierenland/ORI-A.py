@@ -2,7 +2,9 @@ import dataclasses
 from enum import Enum
 from typing import Union, get_args, get_origin, get_type_hints
 from uuid import uuid4
+from random import randint
 
+import lxml.etree as ET
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
 from ORI_A import ORI_A, AgendapuntGegevens, Serializable, VergaderingGegevens
@@ -12,12 +14,12 @@ from ORI_A import ORI_A, AgendapuntGegevens, Serializable, VergaderingGegevens
 class_dummy_map = {
     int: 1,
     str: "test",
-    bool: True,
-    XmlDate: "22-05-2017",
-    XmlDateTime: "22-05-2017T03:02:01",
+    bool: "true",
+    XmlDate: "2017-10-22",
+    XmlDateTime: "2017-10-22T03:02:01",
     XmlTime: "03:02:01",
     # these exists to halt infinite recursion
-    VergaderingGegevens: VergaderingGegevens(naam="test", datum="22-05-2017"),
+    VergaderingGegevens: VergaderingGegevens(naam="test", datum="2017-10-22"),
     AgendapuntGegevens: AgendapuntGegevens("test", "test"),
 }
 
@@ -31,8 +33,19 @@ def _init_obj(cls: Serializable) -> Serializable:
         
         # get field's expected type
         if get_origin(field_type) is Union:
-            repeatable = True
-            field_type = get_args(field_type)[0]
+            field_types = get_args(field_type)
+            field_type = field_types[0]
+
+            # Unlike MDTO, ORI-A has instances where a param can take values of
+            # different types, but is non-repeatable. So, while the logic below wouldn't
+            # be needed for MDTO, it is for ORI-A.
+            if get_origin(field_types[1]) is list:
+                repeatable = True
+            else:
+                # non-determinism in tests sucks, but so does keeping track of which types
+                # you have already supplied to a non-repeatable field
+                field_type = field_types[randint(0, len(field_types)-1)]
+                repeatable = False
         else:
             repeatable = False
 
@@ -46,6 +59,9 @@ def _init_obj(cls: Serializable) -> Serializable:
         elif field.name == "ID":
             # IDs must be unique
             class_args[field.name] = uuid4()
+        elif field.name.lower().endswith("volgnummer"):
+            # volgnummers have to start with numbers
+            class_args[field.name] = "1b"
         else:
             dummy_val = class_dummy_map[field_type]
             class_args[field.name] = [dummy_val] * 2 if repeatable else dummy_val
@@ -57,6 +73,10 @@ def test_dataclass_definitions_match_XSD_rules():
     # do not use getattr and dir: use the ORI-A dataclass itself instead!
 
     obj = _init_obj(ORI_A)
-    obj.to_xml("ORI_A")
+    xml = obj.to_xml("ORI_A")
+    ori_a_schema = ET.XMLSchema(ET.parse("ORI-A.xsd"))
+    obj.save("/tmp/t.xml")
+
     assert True
+    # assert ori_a_schema.validate(xml)
     
