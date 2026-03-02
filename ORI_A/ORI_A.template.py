@@ -445,7 +445,7 @@ class ORI_A(Serializable):
             https://lxml.de/apidoc/lxml.etree.html#lxml.etree._ElementTree.write
 
         Raises:
-            ValidationError: ~~Object voilates the ORI-A schema~~ NOT IMPLEMENTED YET 
+            ValidationError: ~~Object voilates the ORI-A schema~~ NOT IMPLEMENTED YET
         """
         # lxml wants files in binary mode, so pass along a file's raw byte stream
         if hasattr(file_or_filename, "write"):
