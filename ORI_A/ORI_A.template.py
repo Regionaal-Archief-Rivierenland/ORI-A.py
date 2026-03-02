@@ -356,7 +356,7 @@ class ORI_A(Serializable):
            write ORI-A XML to a file, look into the `.save()` method.
 
         Returns:
-            ET.ElementTree: XML seralization of the object
+            ET.Element: XML seralization of the object
         """
 
         xsi_ns = "http://www.w3.org/2001/XMLSchema-instance"
