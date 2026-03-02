@@ -72,10 +72,9 @@ def test_dataclass_definitions_match_XSD_rules():
     """Test if dataclass field type annotations match the rules in the XSD"""
 
     obj = _init_obj(ORI_A)
-    xml = obj.to_xml("ORI_A")
-    ori_a_schema = ET.XMLSchema(ET.parse("ORI-A.xsd"))
-    obj.save("/tmp/t.xml")
+    xml = obj.to_xml("ORI-A")
+    ori_a_schema = ET.XMLSchema(file="ORI-A.xsd")
 
-    assert True
-    # assert ori_a_schema.validate(xml)
-    
+    # do a roundtrip to avoid having to set the namespace on every single
+    # in-memory element
+    ori_a_schema.assertValid(ET.fromstring(ET.tostring(xml)))
