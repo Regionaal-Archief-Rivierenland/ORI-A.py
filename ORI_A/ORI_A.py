@@ -1,15 +1,16 @@
 import dataclasses
 
 from dataclasses import Field, dataclass
-from enum import Enum
+from enum import StrEnum
 
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
 import lxml.etree as ET
 
+
 class Serializable:
     @classmethod
-    def _ORI_A_ordered_fields(cls) -> list[Field]:
+    def _ORI_A_ordered_fields(cls) -> tuple[Field]:
         """Return dataclass fields by their order in the ORI-A XSD.
 
         This method should be overridden when the order of fields in
@@ -54,8 +55,9 @@ class Serializable:
                 else:
                     # micro-optim: create subelem and .text content in one go
                     ET.SubElement(root_elem, field_name).text = str(val)
-                    
+
         return root_elem
+
 
 
 @dataclass
@@ -177,7 +179,7 @@ class BegripGegevens(Serializable):
     begripCode: str = None
 
     @classmethod
-    def _ORI_A_ordered_fields(cls) -> list[Field]:
+    def _ORI_A_ordered_fields(cls) -> tuple[Field]:
         """Sort dataclass fields by their order in the ORI-A XSD."""
         fields = super()._ORI_A_ordered_fields()
         # swap order of begripBegrippenlijst and begripCode
@@ -223,11 +225,12 @@ class DagelijksBestuurLidmaatschapGegevens(Serializable):
     datumEindeDagelijksBestuurLidmaatschap: XmlDate = None
 
     @classmethod
-    def _ORI_A_ordered_fields(cls) -> list[Field]:
+    def _ORI_A_ordered_fields(cls) -> tuple[Field]:
         """Sort dataclass fields by their order in the ORI-A XSD."""
         fields = super()._ORI_A_ordered_fields()
         # move first field to the back
         return fields[1:] + fields[:1]
+
 
 @dataclass
 class FractielidmaatschapGegevens(Serializable):
@@ -250,6 +253,9 @@ class FractielidmaatschapGegevens(Serializable):
     datumEindeFractielidmaatschap: XmlDate = None
     indicatieVoorzitter: bool = None
 
+    def _ORI_A_ordered_fields(self) -> tuple(Field):
+        fields = super()._ORI_A_ordered_fields()
+        return fields[1:-1] + (fields[0],)
 
 @dataclass
 class StemGegevens(Serializable):
@@ -266,6 +272,10 @@ class StemGegevens(Serializable):
     keuzeStemming: KeuzeStemmingEnum
     gegevenOpStemming: VerwijzingGegevens
     ID: str | list[str] = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[2], fields[0], fields[1])
 
 
 @dataclass
@@ -285,6 +295,9 @@ class StemresultaatPerFractieGegevens(Serializable):
     verwijzingStemming: VerwijzingGegevens
     ID: str | list[str] = None
 
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[-1], fields[0], fields[1])
 
 @dataclass
 class DagelijksBestuurGegevens(Serializable):
@@ -321,7 +334,9 @@ class FractieGegevens(Serializable):
     ID: str | list[str]
     naam: str
     overheidsorgaan: BegripGegevens = None
-    neemtDeelAanStemming: StemresultaatPerFractieGegevens | list[StemresultaatPerFractieGegevens] = None
+    neemtDeelAanStemming: (
+        StemresultaatPerFractieGegevens | list[StemresultaatPerFractieGegevens]
+    ) = None
 
 
 @dataclass
@@ -338,6 +353,9 @@ class InformatieobjectGegevens(Serializable):
 
     verwijzingInformatieobject: VerwijzingGegevens
     informatieobjectType: BegripGegevens = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        return super()._ORI_A_ordered_fields()[::-1]
 
 
 @dataclass
@@ -368,7 +386,6 @@ class NatuurlijkPersoonGegevens(Serializable):
     isLidVanFractie: FractielidmaatschapGegevens = None
     isLidVanDagelijksBestuur: DagelijksBestuurLidmaatschapGegevens = None
 
-
 @dataclass
 class StemmingGegevens(Serializable):
     """Gegevens over een stemming, zoals het agendapunt of de persoon waarover gestemd is.
@@ -398,9 +415,17 @@ class StemmingGegevens(Serializable):
     type: StemmingTypeEnum = None
     resultaatMondelingeStemming: ResultaatMondelingeStemmingEnum = None
     resultaatStemmingOverPersonen: str = None
-    stemmingOverPersonen: StemmingOverPersonenGegevens | list[StemmingOverPersonenGegevens] = None
+    stemmingOverPersonen: (
+        StemmingOverPersonenGegevens | list[StemmingOverPersonenGegevens]
+    ) = None
     leidtTotBesluit: VerwijzingGegevens = None
-    heeftBetrekkingOpBesluitvormingsstuk: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
+    heeftBetrekkingOpBesluitvormingsstuk: (
+        InformatieobjectGegevens | list[InformatieobjectGegevens]
+    ) = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[0], fields[2]) + fields[3:7] + (fields[1], fields[-1])
 
 
 @dataclass
@@ -491,10 +516,16 @@ class VergaderingGegevens(Serializable):
     weblocatie: str = None
     status: VergaderingStatusEnum = None
     overheidsorgaan: BegripGegevens = None
-    isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
+    isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = (
+        None
+    )
     isGenotuleerdIn: InformatieobjectGegevens = None
     heeftAlsBijlage: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
     heeftAlsDeelvergadering: VergaderingGegevens | list[VergaderingGegevens] = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        f = super()._ORI_A_ordered_fields()
+        return (f[2], f[0], f[3], f[1], f[4]) + f[5:]
 
 
 @dataclass
@@ -556,7 +587,9 @@ class AgendapuntGegevens(Serializable):
     geplandeEindtijd: XmlDateTime = None
     starttijd: XmlDateTime = None
     eindtijd: XmlDateTime = None
-    tijdsaanduidingMediabron: TijdsaanduidingGegevens | list[TijdsaanduidingGegevens] = None
+    tijdsaanduidingMediabron: (
+        TijdsaanduidingGegevens | list[TijdsaanduidingGegevens]
+    ) = None
     locatie: str = None
     indicatieHamerstuk: bool = None
     indicatieBehandeld: bool = None
@@ -599,7 +632,13 @@ class SpreekfragmentGegevens(Serializable):
     taal: str = None
     tekst: str = None
     positieNotulen: str = None
-    tijdsaanduidingMediabron: TijdsaanduidingGegevens | list[TijdsaanduidingGegevens] = None
+    tijdsaanduidingMediabron: (
+        TijdsaanduidingGegevens | list[TijdsaanduidingGegevens]
+    ) = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[1],) + fields[2:] + (fields[0],)
 
 
 @dataclass
@@ -640,8 +679,13 @@ class AanwezigeDeelnemerGegevens(Serializable):
     eindeAanwezigheid: XmlDateTime = None
     neemtDeelAanVergadering: VerwijzingGegevens | list[VerwijzingGegevens] = None
     neemtDeelAanStemming: StemGegevens | list[StemGegevens] = None
-    spreektTijdensSpreekfragment: SpreekfragmentGegevens | list[SpreekfragmentGegevens] = None
+    spreektTijdensSpreekfragment: (
+        SpreekfragmentGegevens | list[SpreekfragmentGegevens]
+    ) = None
 
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[1],) + fields[2:8] + (fields[0],) + fields[8:]
 
 # TODO: insert your monkeypatch here
 @dataclass
@@ -654,8 +698,12 @@ class ORI_A(Serializable):
     besluit: BesluitGegevens | list[BesluitGegevens] = None
     fractie: FractieGegevens | list[FractieGegevens] = None
     dagelijksBestuur: DagelijksBestuurGegevens | list[DagelijksBestuurGegevens] = None
-    persoonBuitenVergadering: NatuurlijkPersoonGegevens | list[NatuurlijkPersoonGegevens] = None
-    aanwezigeDeelnemer: AanwezigeDeelnemerGegevens | list[AanwezigeDeelnemerGegevens] = None
+    persoonBuitenVergadering: (
+        NatuurlijkPersoonGegevens | list[NatuurlijkPersoonGegevens]
+    ) = None
+    aanwezigeDeelnemer: (
+        AanwezigeDeelnemerGegevens | list[AanwezigeDeelnemerGegevens]
+    ) = None
 
     def to_xml(self, root: str) -> ET.Element:
         """Transform ORI-A object into an XML tree with the following structure:
@@ -671,7 +719,7 @@ class ORI_A(Serializable):
            write ORI-A XML to a file, look into the `.save()` method.
 
         Returns:
-            ET.ElementTree: XML seralization of the object
+            ET.Element: XML seralization of the object
         """
 
         xsi_ns = "http://www.w3.org/2001/XMLSchema-instance"
@@ -714,7 +762,7 @@ class ORI_A(Serializable):
             https://lxml.de/apidoc/lxml.etree.html#lxml.etree._ElementTree.write
 
         Raises:
-            ValidationError: ~~Object voilates the ORI-A schema~~ NOT IMPLEMENTED YET 
+            ValidationError: ~~Object voilates the ORI-A schema~~ NOT IMPLEMENTED YET
         """
         # lxml wants files in binary mode, so pass along a file's raw byte stream
         if hasattr(file_or_filename, "write"):
@@ -738,10 +786,9 @@ class ORI_A(Serializable):
         tree.write(file_or_filename, **(lxml_defaults | lxml_kwargs))
 
 
-
 # TODO: generate docstrings for these as well (just a list of options is good)
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
-class BesluitResultaatEnum(Enum):
+class BesluitResultaatEnum(StrEnum):
     """"""
 
     unaniem_aangenomen = "Unaniem aangenomen"
@@ -752,7 +799,7 @@ class BesluitResultaatEnum(Enum):
     aangehouden = "Aangehouden"
 
 
-class GeslachtsaanduidingEnum(Enum):
+class GeslachtsaanduidingEnum(StrEnum):
     """"""
 
     man = "Man"
@@ -761,7 +808,7 @@ class GeslachtsaanduidingEnum(Enum):
     onbekend = "Onbekend"
 
 
-class KeuzeStemmingEnum(Enum):
+class KeuzeStemmingEnum(StrEnum):
     """"""
 
     tegen = "Tegen"
@@ -769,7 +816,7 @@ class KeuzeStemmingEnum(Enum):
     onthouden = "Onthouden"
 
 
-class ResultaatMondelingeStemmingEnum(Enum):
+class ResultaatMondelingeStemmingEnum(StrEnum):
     """"""
 
     voor = "Voor"
@@ -777,7 +824,7 @@ class ResultaatMondelingeStemmingEnum(Enum):
     gelijk = "Gelijk"
 
 
-class StemmingTypeEnum(Enum):
+class StemmingTypeEnum(StrEnum):
     """"""
 
     hoofdelijk = "Hoofdelijk"
@@ -785,7 +832,7 @@ class StemmingTypeEnum(Enum):
     schriftelijk = "Schriftelijk"
 
 
-class FractieStemresultaatEnum(Enum):
+class FractieStemresultaatEnum(StrEnum):
     """"""
 
     aangenomen = "Aangenomen"
@@ -793,7 +840,7 @@ class FractieStemresultaatEnum(Enum):
     verdeeld = "Verdeeld"
 
 
-class VergaderingStatusEnum(Enum):
+class VergaderingStatusEnum(StrEnum):
     """"""
 
     gepland = "Gepland"
