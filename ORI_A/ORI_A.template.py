@@ -7,9 +7,10 @@ from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
 import lxml.etree as ET
 
+
 class Serializable:
     @classmethod
-    def _ORI_A_ordered_fields(cls) -> list[Field]:
+    def _ORI_A_ordered_fields(cls) -> tuple[Field]:
         """Return dataclass fields by their order in the ORI-A XSD.
 
         This method should be overridden when the order of fields in
@@ -116,7 +117,7 @@ class BegripGegevens(Serializable):
     begripCode: str = None
 
     @classmethod
-    def _ORI_A_ordered_fields(cls) -> list[Field]:
+    def _ORI_A_ordered_fields(cls) -> tuple[Field]:
         """Sort dataclass fields by their order in the ORI-A XSD."""
         fields = super()._ORI_A_ordered_fields()
         # swap order of begripBegrippenlijst and begripCode
@@ -143,11 +144,12 @@ class DagelijksBestuurLidmaatschapGegevens(Serializable):
     datumEindeDagelijksBestuurLidmaatschap: XmlDate = None
 
     @classmethod
-    def _ORI_A_ordered_fields(cls) -> list[Field]:
+    def _ORI_A_ordered_fields(cls) -> tuple[Field]:
         """Sort dataclass fields by their order in the ORI-A XSD."""
         fields = super()._ORI_A_ordered_fields()
         # move first field to the back
         return fields[1:] + fields[:1]
+
 
 @dataclass
 class FractielidmaatschapGegevens(Serializable):
