@@ -2,7 +2,7 @@ from __future__ import annotations
 import dataclasses
 
 from dataclasses import Field, dataclass
-from enum import Enum
+from enum import StrEnum
 
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
@@ -423,10 +423,9 @@ class ORI_A(Serializable):
         tree.write(file_or_filename, **(lxml_defaults | lxml_kwargs))
 
 
-
 # TODO: generate docstrings for these as well (just a list of options is good)
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
-class BesluitResultaatEnum(Enum):
+class BesluitResultaatEnum(StrEnum):
     """{{docs.besluitResultaatEnum}}"""
 
     unaniem_aangenomen = "Unaniem aangenomen"
@@ -437,7 +436,7 @@ class BesluitResultaatEnum(Enum):
     aangehouden = "Aangehouden"
 
 
-class GeslachtsaanduidingEnum(Enum):
+class GeslachtsaanduidingEnum(StrEnum):
     """{{docs.geslachtsaanduidingEnum}}"""
 
     man = "Man"
@@ -446,7 +445,7 @@ class GeslachtsaanduidingEnum(Enum):
     onbekend = "Onbekend"
 
 
-class KeuzeStemmingEnum(Enum):
+class KeuzeStemmingEnum(StrEnum):
     """{{docs.keuzeStemmingEnum}}"""
 
     tegen = "Tegen"
@@ -454,7 +453,7 @@ class KeuzeStemmingEnum(Enum):
     onthouden = "Onthouden"
 
 
-class ResultaatMondelingeStemmingEnum(Enum):
+class ResultaatMondelingeStemmingEnum(StrEnum):
     """{{docs.resultaatMondelingeStemmingEnum}}"""
 
     voor = "Voor"
@@ -462,7 +461,7 @@ class ResultaatMondelingeStemmingEnum(Enum):
     gelijk = "Gelijk"
 
 
-class StemmingTypeEnum(Enum):
+class StemmingTypeEnum(StrEnum):
     """{{docs.stemmingTypeEnum}}"""
 
     hoofdelijk = "Hoofdelijk"
@@ -470,7 +469,7 @@ class StemmingTypeEnum(Enum):
     schriftelijk = "Schriftelijk"
 
 
-class FractieStemresultaatEnum(Enum):
+class FractieStemresultaatEnum(StrEnum):
     """{{docs.fractieStemresultaatEnum}}"""
 
     aangenomen = "Aangenomen"
@@ -478,7 +477,7 @@ class FractieStemresultaatEnum(Enum):
     verdeeld = "Verdeeld"
 
 
-class VergaderingStatusEnum(Enum):
+class VergaderingStatusEnum(StrEnum):
     """{{docs.vergaderingStatusEnum}}"""
 
     gepland = "Gepland"
