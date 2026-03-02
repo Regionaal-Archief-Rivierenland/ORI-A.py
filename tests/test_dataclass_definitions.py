@@ -73,7 +73,7 @@ def test_dataclass_definitions_match_XSD_rules():
 
     obj = _init_obj(ORI_A)
     xml = obj.to_xml("ORI-A")
-    ori_a_schema = ET.XMLSchema(file="ORI-A.xsd")
+    ori_a_schema = ET.XMLSchema(file="ORI-A-XSD/ORI-A.xsd")
 
     # do a roundtrip to avoid having to set the namespace on every single
     # in-memory element
