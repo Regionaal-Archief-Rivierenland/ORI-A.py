@@ -196,7 +196,9 @@ class FractieGegevens(Serializable):
     ID: str | list[str]
     naam: str
     overheidsorgaan: BegripGegevens = None
-    neemtDeelAanStemming: StemresultaatPerFractieGegevens | list[StemresultaatPerFractieGegevens] = None
+    neemtDeelAanStemming: (
+        StemresultaatPerFractieGegevens | list[StemresultaatPerFractieGegevens]
+    ) = None
 
 
 @dataclass
@@ -219,7 +221,6 @@ class NatuurlijkPersoonGegevens(Serializable):
     isLidVanFractie: FractielidmaatschapGegevens = None
     isLidVanDagelijksBestuur: DagelijksBestuurLidmaatschapGegevens = None
 
-
 @dataclass
 class StemmingGegevens(Serializable):
     """{{docs.stemmingGegevens}}"""
@@ -229,9 +230,13 @@ class StemmingGegevens(Serializable):
     type: StemmingTypeEnum = None
     resultaatMondelingeStemming: ResultaatMondelingeStemmingEnum = None
     resultaatStemmingOverPersonen: str = None
-    stemmingOverPersonen: StemmingOverPersonenGegevens | list[StemmingOverPersonenGegevens] = None
+    stemmingOverPersonen: (
+        StemmingOverPersonenGegevens | list[StemmingOverPersonenGegevens]
+    ) = None
     leidtTotBesluit: VerwijzingGegevens = None
-    heeftBetrekkingOpBesluitvormingsstuk: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
+    heeftBetrekkingOpBesluitvormingsstuk: (
+        InformatieobjectGegevens | list[InformatieobjectGegevens]
+    ) = None
 
 
 @dataclass
@@ -263,7 +268,9 @@ class VergaderingGegevens(Serializable):
     weblocatie: str = None
     status: VergaderingStatusEnum = None
     overheidsorgaan: BegripGegevens = None
-    isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
+    isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = (
+        None
+    )
     isGenotuleerdIn: InformatieobjectGegevens = None
     heeftAlsBijlage: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
     heeftAlsDeelvergadering: VergaderingGegevens | list[VergaderingGegevens] = None
@@ -285,7 +292,9 @@ class AgendapuntGegevens(Serializable):
     geplandeEindtijd: XmlDateTime = None
     starttijd: XmlDateTime = None
     eindtijd: XmlDateTime = None
-    tijdsaanduidingMediabron: TijdsaanduidingGegevens | list[TijdsaanduidingGegevens] = None
+    tijdsaanduidingMediabron: (
+        TijdsaanduidingGegevens | list[TijdsaanduidingGegevens]
+    ) = None
     locatie: str = None
     indicatieHamerstuk: bool = None
     indicatieBehandeld: bool = None
@@ -309,7 +318,9 @@ class SpreekfragmentGegevens(Serializable):
     taal: str = None
     tekst: str = None
     positieNotulen: str = None
-    tijdsaanduidingMediabron: TijdsaanduidingGegevens | list[TijdsaanduidingGegevens] = None
+    tijdsaanduidingMediabron: (
+        TijdsaanduidingGegevens | list[TijdsaanduidingGegevens]
+    ) = None
 
 
 @dataclass
@@ -325,7 +336,9 @@ class AanwezigeDeelnemerGegevens(Serializable):
     eindeAanwezigheid: XmlDateTime = None
     neemtDeelAanVergadering: VerwijzingGegevens | list[VerwijzingGegevens] = None
     neemtDeelAanStemming: StemGegevens | list[StemGegevens] = None
-    spreektTijdensSpreekfragment: SpreekfragmentGegevens | list[SpreekfragmentGegevens] = None
+    spreektTijdensSpreekfragment: (
+        SpreekfragmentGegevens | list[SpreekfragmentGegevens]
+    ) = None
 
 
 # TODO: insert your monkeypatch here
@@ -339,8 +352,12 @@ class ORI_A(Serializable):
     besluit: BesluitGegevens | list[BesluitGegevens] = None
     fractie: FractieGegevens | list[FractieGegevens] = None
     dagelijksBestuur: DagelijksBestuurGegevens | list[DagelijksBestuurGegevens] = None
-    persoonBuitenVergadering: NatuurlijkPersoonGegevens | list[NatuurlijkPersoonGegevens] = None
-    aanwezigeDeelnemer: AanwezigeDeelnemerGegevens | list[AanwezigeDeelnemerGegevens] = None
+    persoonBuitenVergadering: (
+        NatuurlijkPersoonGegevens | list[NatuurlijkPersoonGegevens]
+    ) = None
+    aanwezigeDeelnemer: (
+        AanwezigeDeelnemerGegevens | list[AanwezigeDeelnemerGegevens]
+    ) = None
 
     def to_xml(self, root: str) -> ET.Element:
         """Transform ORI-A object into an XML tree with the following structure:
