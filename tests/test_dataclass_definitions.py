@@ -69,8 +69,7 @@ def _init_obj(cls: Serializable) -> Serializable:
     return cls(**class_args)
 
 def test_dataclass_definitions_match_XSD_rules():
-    """Test if dataclass field definitions match the rules in the XSD"""
-    # do not use getattr and dir: use the ORI-A dataclass itself instead!
+    """Test if dataclass field type annotations match the rules in the XSD"""
 
     obj = _init_obj(ORI_A)
     xml = obj.to_xml("ORI_A")
