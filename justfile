@@ -6,7 +6,7 @@ build:
     python ORI_A/ORI_A.template.py || exit 1
     # make file temporarily writeable
     chmod u+w ORI_A/ORI_A.py
-    ./generate_docstrings.py "ORI_A/ORI_A.xsd" "ORI_A/ORI_A.template.py"
+    ./generate_docstrings.py ORI-A-XSD/ORI-A.xsd "ORI_A/ORI_A.template.py"
     chmod u-w ORI_A/ORI_A.py
 
 test:
