@@ -161,6 +161,9 @@ class FractielidmaatschapGegevens(Serializable):
     datumEindeFractielidmaatschap: XmlDate = None
     indicatieVoorzitter: bool = None
 
+    def _ORI_A_ordered_fields(self) -> tuple(Field):
+        fields = super()._ORI_A_ordered_fields()
+        return fields[1:-1] + (fields[0],)
 
 @dataclass
 class StemGegevens(Serializable):
@@ -169,6 +172,10 @@ class StemGegevens(Serializable):
     keuzeStemming: KeuzeStemmingEnum
     gegevenOpStemming: VerwijzingGegevens
     ID: str | list[str] = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[2], fields[0], fields[1])
 
 
 @dataclass
@@ -179,6 +186,9 @@ class StemresultaatPerFractieGegevens(Serializable):
     verwijzingStemming: VerwijzingGegevens
     ID: str | list[str] = None
 
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[-1], fields[0], fields[1])
 
 @dataclass
 class DagelijksBestuurGegevens(Serializable):
@@ -209,6 +219,9 @@ class InformatieobjectGegevens(Serializable):
     verwijzingInformatieobject: VerwijzingGegevens
     informatieobjectType: BegripGegevens = None
 
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        return super()._ORI_A_ordered_fields()[::-1]
+
 
 @dataclass
 class NatuurlijkPersoonGegevens(Serializable):
@@ -238,6 +251,10 @@ class StemmingGegevens(Serializable):
     heeftBetrekkingOpBesluitvormingsstuk: (
         InformatieobjectGegevens | list[InformatieobjectGegevens]
     ) = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[0], fields[2]) + fields[3:7] + (fields[1], fields[-1])
 
 
 @dataclass
@@ -275,6 +292,10 @@ class VergaderingGegevens(Serializable):
     isGenotuleerdIn: InformatieobjectGegevens = None
     heeftAlsBijlage: InformatieobjectGegevens | list[InformatieobjectGegevens] = None
     heeftAlsDeelvergadering: VergaderingGegevens | list[VergaderingGegevens] = None
+
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        f = super()._ORI_A_ordered_fields()
+        return (f[2], f[0], f[3], f[1], f[4]) + f[5:]
 
 
 @dataclass
@@ -323,6 +344,10 @@ class SpreekfragmentGegevens(Serializable):
         TijdsaanduidingGegevens | list[TijdsaanduidingGegevens]
     ) = None
 
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[1],) + fields[2:] + (fields[0],)
+
 
 @dataclass
 class AanwezigeDeelnemerGegevens(Serializable):
@@ -341,6 +366,9 @@ class AanwezigeDeelnemerGegevens(Serializable):
         SpreekfragmentGegevens | list[SpreekfragmentGegevens]
     ) = None
 
+    def _ORI_A_ordered_fields(self) -> tuple[Field]:
+        fields = super()._ORI_A_ordered_fields()
+        return (fields[1],) + fields[2:8] + (fields[0],) + fields[8:]
 
 # TODO: insert your monkeypatch here
 @dataclass
