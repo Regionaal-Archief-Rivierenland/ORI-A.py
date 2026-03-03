@@ -14,7 +14,7 @@ from ORI_A import ORI_A, AgendapuntGegevens, Serializable, VergaderingGegevens
 class_dummy_map = {
     int: 1,
     str: "test",
-    bool: "true",
+    bool: True,
     XmlDate: "2017-10-22",
     XmlDateTime: "2017-10-22T03:02:01",
     XmlTime: "03:02:01",

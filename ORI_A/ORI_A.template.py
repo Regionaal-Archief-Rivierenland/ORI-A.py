@@ -52,8 +52,10 @@ class Serializable:
             for val in field_value:
                 if isinstance(val, Serializable):
                     root_elem.append(val.to_xml(field_name))
-                else:
+                elif isinstance(val, bool):
                     # micro-optim: create subelem and .text content in one go
+                    ET.SubElement(root_elem, field_name).text = str(val).lower()
+                else:
                     ET.SubElement(root_elem, field_name).text = str(val)
                     
         return root_elem
