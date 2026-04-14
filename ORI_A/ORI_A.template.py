@@ -259,12 +259,6 @@ class StemmingGegevens(Serializable):
         return (fields[0], fields[2]) + fields[3:7] + (fields[1], fields[-1])
 
 
-# TODO: move to a helpers file
-def _integer_to_timestamp(secs: int) -> str:
-    hours, remainder = divmod(secs, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return f"{hours:02}:{minutes:02}:{seconds:02}"
-
 @dataclass
 class TijdsaanduidingGegevens(Serializable):
     """{{docs.tijdsaanduidingGegevens}}"""
@@ -272,6 +266,14 @@ class TijdsaanduidingGegevens(Serializable):
     aanvang: int | XmlTime
     einde: int | XmlTime = None
     isRelatiefTot: InformatieobjectGegevens = None
+
+    # not sure if we should keep this a staticmethod, but it's def handy sometimes
+    @staticmethod
+    def _integer_to_timestamp(secs: int) -> str:
+        hours, remainder = divmod(secs, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+
 
     def integers_to_timestamps(self) -> None:
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps."""
@@ -282,10 +284,10 @@ class TijdsaanduidingGegevens(Serializable):
         if self.einde is not None and not isinstance(self.einde, int):
             raise TypeError("TijdsaanduidingGegevens.einde is not an integer")
 
-        self.aanvang = _integer_to_timestamp(self.aanvang)
+        self.aanvang = self._integer_to_timestamp(self.aanvang)
 
         if self.einde is not None:
-            self.einde = _integer_to_timestamp(self.einde)
+            self.einde = self._integer_to_timestamp(self.einde)
 
 
 
