@@ -448,6 +448,12 @@ class StemmingGegevens(Serializable):
         return (fields[0], fields[2]) + fields[3:7] + (fields[1], fields[-1])
 
 
+# TODO: move to a helpers file
+def _integer_to_timestamp(secs: int) -> str:
+    hours, remainder = divmod(secs, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
+
 @dataclass
 class TijdsaanduidingGegevens(Serializable):
     """Gegevens om het begin- en eindpunt van een gebeurtenis in een mediabron aan te geven,
@@ -473,14 +479,6 @@ class TijdsaanduidingGegevens(Serializable):
     aanvang: int | XmlTime
     einde: int | XmlTime = None
     isRelatiefTot: InformatieobjectGegevens = None
-
-    # not sure if we should keep this a staticmethod, but it's def handy sometimes
-    @staticmethod
-    def _integer_to_timestamp(secs: int) -> str:
-        hours, remainder = divmod(secs, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        return f"{hours:02}:{minutes:02}:{seconds:02}"
-
 
     def integers_to_timestamps(self) -> None:
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps."""
