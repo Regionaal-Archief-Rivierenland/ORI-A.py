@@ -428,7 +428,7 @@ class ORI_A(Serializable):
 
         Note:
            There is rarely a real reason to use this directly. If you want to
-           write ORI-A XML to a file, look into the `.save()` method.
+           write ORI-A XML to a file, see the `.save()` method.
 
         Returns:
             ET.Element: XML seralization of the object
