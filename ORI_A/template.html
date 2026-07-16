@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ vergadering.naam }} ({{vergadering.overheidsorgaan.begripLabel}})</title>
+    <link rel="stylesheet" href="pico.min.css">
+    <link rel="stylesheet" href="main.css">
+    <meta name="color-scheme" content="only light">
+    <script>
+      function jumpToTime(seconds) {
+          const media = document.getElementById("media");
+          media.currentTime = seconds;
+          media.play();
+      }
+    </script>
+  </head>
+  <body>
+    <main class="container">
+      <article class=card role="document">
+          
+        <header style="display: flex; align-items: center; gap: 1.5rem;">
+          <div>
+            <h1 class="titel">{{ vergadering.naam }}</h1>
+            <p class="muted"><svg height=1.0em id="kalender" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/></svg>
+              <span>{{ vergadering.datum.strftime("%d %B %Y") }}</span>
+              {% if vergadering.aanvang %}
+              <svg xmlns="http://www.w3.org/2000/svg" height=1.0em viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><polyline points="128 72 128 128 184 128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg> 
+              <span>{{ vergadering.aanvang.strftime("%H:%M:%S") }} {% if vergadering.einde %} – {{vergadering.einde.strftime("%H:%M:%S")}} {% endif %}</span>
+              {% endif %}
+              <svg id="locatie" height=1em fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12 11.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5m0-9.5a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/></svg>
+              <span>{{vergadering.locatie}}</span>
+            </p>
+            <p class="muted"><strong>Georganiseerd door:&nbsp;</strong> {{vergadering.overheidsorgaan.begripLabel}}</p>
+          </div>
+          <a role="button" download href={{ori_a_xml}} class="outline secondary">Als ORI-A XML downloaden</a>
+      <!--
+      <table>
+        <tbody>
+          <tr>
+            <td class="key">Georganiseerd door</td>
+            <td>{{vergadering.overheidsorgaan.begripLabel}}</td>
+          </tr>
+          <tr>
+            <td class="key">Locatie</td>
+            <td>}</td> 
+          </tr>
+          {% if vergadering.type %}
+          <tr>
+            <td class="key">Soort vergadering</td>
+            <td>{{ vergadering.type.begripLabel }}</td>
+          </tr>
+          {% endif %}
+      </tbody></table> -->
+        </header>
+      <audio id="media" src="{{src}}" controls="controls"></audio>
+      <h1 class="agendapunt-h1">📅 Agendapunten</h1>
+      <hr>
+      {%- for a in agendapunt -%}
+      <div class="grid agendapunt">
+        {# only generate dropdown if there is more to show  #}
+        {% if agendapunt_spreekfragmenten[a.ID] %}
+        <details>
+          <summary class="outline contrast" role="button">{{a.volgnummerWeergave if a.volgnummerWeergave else a.volgnummer~"."}} {{ a.naam }}</summary>
+          <details class="spreekfragment">
+            <summary>Sprekers</summary>
+            <ul>
+              {%- for fragment in agendapunt_spreekfragmenten[a.ID] -%}
+              <li>{{ fragment.deelnemer.isNatuurlijkPersoon.naam.volledigeNaam }}{% if fragment.fractie %} • <span>{{fragment.fractie.naam}}</span>{% endif %} • <a onclick="jumpToTime({{fragment.aanvang_integer}})">{{fragment.aanvang}}</a></li>
+              {%- endfor -%}
+            </ul>
+          </details>
+        </details>
+        {% else %}
+        <div class="empty-agendapunt">{{a.volgnummerWeergave if a.volgnummerWeergave else a.volgnummer~"."}} {{ a.naam }}</div>
+        {% endif %}
+        {% if a.tijdsaanduidingMediabron %}<a class="small" role="button" onclick="jumpToTime({{a._aanvang_integer}})">▶ {{a.tijdsaanduidingMediabron.aanvang}}</a>{% endif %}
+        
+      </div>
+      {% endfor %}
+</article>
+</main>
+</body>
+</html>
