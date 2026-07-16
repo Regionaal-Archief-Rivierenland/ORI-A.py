@@ -1,4 +1,5 @@
 import dataclasses
+import json
 
 from dataclasses import Field, dataclass
 from enum import StrEnum
@@ -60,6 +61,32 @@ class Serializable:
                     
         return root_elem
 
+    # Think this maybe should be something done in (post)init? thay way you can make it a property
+    def _ori_aliases(self) -> dict[str, str]:
+        """Override this function when property names in ORI and ORI-A differ"""
+        return {f.name: f.name for f in dataclasses.fields(self)}
+
+    # note: the performance of all of this is not amazing. To fix this, we must precompute stuff
+    def to_ori_json(self) -> str:
+        strip_none = lambda d: {k: v for k, v in d if v is not None}
+        # FIXME: asdict is not "recursive". Other Serializables/dataclasses are treated as dicts.
+        # I think this causes self._ori_aliases() in subclasses to be ignored.
+        d = dataclasses.asdict(self, dict_factory=strip_none)
+        aliased = {self._ori_aliases()[k]: v for k, v in d.items()}
+        return json.dumps(aliased)
+
+    @classmethod
+    def _from_elem(cls, elem: ET.Element):
+        """Private helper method stub.
+
+        Used within open() to construct a gegevensgroep from an ET.Element.
+        This stub is dynamically implemented at runtime.
+        """
+        pass
+
+# TODO: generate docstrings for these as well (just a list of options is good)
+# TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
+# TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
 
 @dataclass
 class GremiumGegevens(Serializable):
@@ -67,6 +94,10 @@ class GremiumGegevens(Serializable):
 
     naam: str
     identificatie: str = None
+
+    # instead of complex system with aliases and transformers, maybe just override a single method?
+    def _ori_aliases(self):
+        return {"naam": "gremiumnaam", "identificatie": "gremiumidentificatie"}
 
 
 @dataclass
@@ -495,6 +526,62 @@ class ORI_A(Serializable):
         # `|` is a union operator; it merges two dicts, with right-hand side taking precedence
         tree.write(file_or_filename, **(lxml_defaults | lxml_kwargs))
 
+    def to_html(self, outfile, jinja_template="template.html"):
+        # is this import worth it? probably is okay if we make this optional deps
+        import mdto
+        from jinja2 import Template
+
+        with open(jinja_template) as f:
+            template = Template(f.read())
+
+        # todo: ensure nothing modifies properties of `self`
+        # fixme: idk if any of this media extraction logic works
+        media_id = self.vergadering.isVastgelegdMiddels.verwijzingInformatieobject.verwijzingID
+        media_path = list(Path(".").rglob(f"**/*{media_id}*xml"))[0]
+        media = mdto.Informatieobject.open(media_path)
+        src = media_path.parent / media.heeftRepresentatie.verwijzingNaam
+
+        agendapunt_spreekfragmenten = defaultdict(list)
+        for deelnemer in self.aanwezigeDeelnemer:
+            # listify
+            if not isinstance(deelnemer.spreektTijdensSpreekfragment, list):
+                deelnemer.spreektTijdensSpreekfragment = [deelnemer.spreektTijdensSpreekfragment]
+
+            for fragment in deelnemer.spreektTijdensSpreekfragment:
+                if not fragment.tijdsaanduidingMediabron:
+                    continue
+
+                agendapunt_id = fragment.gedurendeAgendapunt.verwijzingID
+                h, m, s = map(int, fragment.tijdsaanduidingMediabron.aanvang.split(":"))
+                fragment_info = {
+                    "aanvang_integer": h * 3600 + m * 60 + round(s),
+                    "aanvang": fragment.tijdsaanduidingMediabron.aanvang,
+                    "einde": fragment.tijdsaanduidingMediabron.einde,
+                    "deelnemer": deelnemer
+                }
+
+                if deelnemer.isNatuurlijkPersoon.isLidVanFractie:
+                    fractie_ref = deelnemer.isNatuurlijkPersoon.isLidVanFractie.verwijzingFractie.verwijzingID
+                    fractie = next(f for f in self.fractie if f.ID == fractie_ref)
+                    fragment_info["fractie"] = fractie
+
+                agendapunt_spreekfragmenten[agendapunt_id].append(fragment_info)
+            
+        # temporal sort
+        for agendapunt_id in agendapunt_spreekfragmenten:
+            agendapunt_spreekfragmenten[agendapunt_id].sort(key=lambda x: x["aanvang_integer"])
+
+        # todo: ensure that everything listable is a list
+        ori_a_dict = self.__dict__
+        ori_a_dict["src"] = src
+        ori_a_dict["ori_a_xml"] = self._srcfile
+        ori_a_dict["agendapunt_spreekfragmenten"] = agendapunt_spreekfragmenten
+        html = template.render(ori_a_dict)
+
+        with open(outfile, "w") as f:
+            f.write(html)
+
+        
 
 # TODO: generate docstrings for these as well (just a list of options is good)
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
@@ -556,3 +643,102 @@ class VergaderingStatusEnum(StrEnum):
     gepland = "Gepland"
     gehouden = "Gehouden"
     geannuleerd = "Geannuleerd"
+
+
+def _construct_deserialization_classmethods():
+    """
+    Construct the private `_from_elem()` classmethod on all subclasses
+    of `Serializable`.
+
+    This constructor executes on module import, and creates helpers
+    for the public `open()` classmethods of Informatieobject and
+    Bestand.
+    """
+
+    def resolve_type(field_type: type):
+        """Resolve a type from typing annotations. If Union[...] is
+        detected, return the type of the first item."""
+
+        origin = get_origin(field_type)
+        if origin is Union:
+            args = get_args(field_type)
+            return args[0]  # assume first type is what we care about
+        # VergaderingGegevens has a reference to itself
+        elif isinstance(field_type, ForwardRef):
+            return VergaderingGegevens
+        else:
+            return field_type
+
+    def parse_text(elem: ET.Element) -> str:
+        return elem.text
+
+    def parse_int(elem: ET.Element) -> int:
+        # fixme: ugly hack to support both ints and timestamps
+        try:
+            return int(elem.text)
+        except:
+            return elem.text
+
+    def parse_bool(elem: ET.Element) -> bool:
+        return bool(elem.text)
+
+    # fixme: parsing specific dates _formats_ kinda violates the whole
+    # "accept everything" premise
+    def parse_date(elem: ET.Element) -> datetime:
+        return datetime.strptime(elem.text, "%Y-%m-%d")
+
+    def parse_datetime(elem: ET.Element) -> datetime:
+        return datetime.strptime(elem.text, "%Y-%m-%dT%H:%M:%S")
+
+    def from_elem_factory(ori_a_xml_parsers: dict) -> classmethod:
+        """Create initialized from_elem functions."""
+
+        def from_elem(cls, elem: ET.Element):
+            """Convert XML elements (`elem`) to ORI-A classes (`cls`)"""
+
+            # it may seem like pre computing this is faster, but it is not
+            constructor_args = {field: [] for field in ori_a_xml_parsers}
+            for child in elem:
+                ori_a_field = child.tag.removeprefix(
+                    "{https://ori-a.nl}"
+                )
+                parser = ori_a_xml_parsers[ori_a_field]
+                constructor_args[ori_a_field].append(parser(child))
+
+            # cleanup class constructor arguments
+            for argname, value in constructor_args.items():
+                # Replace empty argument lists by None
+                if len(value) == 0:
+                    constructor_args[argname] = None
+                # Replace one-itemed argument lists by their respective item
+                elif len(value) == 1:
+                    constructor_args[argname] = value[0]
+
+            return cls(**constructor_args)
+
+        return classmethod(from_elem)
+
+    # This loop depends on the order of the gegevensgroep defintions in this file
+    for cls in Serializable.__subclasses__():
+        parsers = {}
+        for field in dataclasses.fields(cls):
+            field_name = field.name
+            field_type = resolve_type(field.type)
+            if field_type is str:
+                parsers[field_name] = parse_text
+            elif issubclass(field_type, Serializable):
+                parsers[field_name] = field_type._from_elem
+            elif field_type is int:
+                parsers[field_name] = parse_int
+            elif field_type is XmlDate:
+                parsers[field_name] = parse_date
+            elif field_type is XmlDateTime:
+                parsers[field_name] = parse_datetime
+            else:
+                parsers[field_name] = parse_text
+
+        cls._from_elem = from_elem_factory(parsers)
+
+
+# construct all _from_elem() classmethods immediately on import
+_construct_deserialization_classmethods()
