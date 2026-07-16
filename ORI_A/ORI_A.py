@@ -8,6 +8,67 @@ from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
 import lxml.etree as ET
 
+# TODO: generate docstrings for these as well (just a list of options is good)
+# TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
+# TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
+class BesluitResultaatEnum(StrEnum):
+    """"""
+
+    unaniem_aangenomen = "Unaniem aangenomen"
+    aangenomen = "Aangenomen"
+    geamendeerd_aangenomen = "Geamendeerd aangenomen"
+    onder_voorbehoud_aangenomen = "Onder voorbehoud aangenomen"
+    verworpen = "Verworpen"
+    aangehouden = "Aangehouden"
+
+
+class GeslachtsaanduidingEnum(StrEnum):
+    """"""
+
+    man = "Man"
+    vrouw = "Vrouw"
+    anders = "Anders"
+    onbekend = "Onbekend"
+
+
+class KeuzeStemmingEnum(StrEnum):
+    """"""
+
+    tegen = "Tegen"
+    afwezig = "Afwezig"
+    onthouden = "Onthouden"
+
+
+class ResultaatMondelingeStemmingEnum(StrEnum):
+    """"""
+
+    voor = "Voor"
+    tegen = "Tegen"
+    gelijk = "Gelijk"
+
+
+class StemmingTypeEnum(StrEnum):
+    """"""
+
+    hoofdelijk = "Hoofdelijk"
+    regulier = "Regulier"
+    schriftelijk = "Schriftelijk"
+
+
+class FractieStemresultaatEnum(StrEnum):
+    """"""
+
+    aangenomen = "Aangenomen"
+    verworpen = "Verworpen"
+    verdeeld = "Verdeeld"
+
+
+class VergaderingStatusEnum(StrEnum):
+    """"""
+
+    gepland = "Gepland"
+    gehouden = "Gehouden"
+    geannuleerd = "Geannuleerd"
 
 class Serializable:
     @classmethod
@@ -58,7 +119,7 @@ class Serializable:
                     ET.SubElement(root_elem, field_name).text = str(val).lower()
                 else:
                     ET.SubElement(root_elem, field_name).text = str(val)
-
+                    
         return root_elem
 
     # Think this maybe should be something done in (post)init? thay way you can make it a property
@@ -74,7 +135,6 @@ class Serializable:
         d = dataclasses.asdict(self, dict_factory=strip_none)
         aliased = {self._ori_aliases()[k]: v for k, v in d.items()}
         return json.dumps(aliased)
-
 
 @dataclass
 class GremiumGegevens(Serializable):
@@ -473,7 +533,7 @@ class TijdsaanduidingGegevens(Serializable):
           een video-opname. Dit element is alleen nodig wanneer er meer dan een
           mediabron aan een vergadering is gerelateerd. Als dit element ontbreekt, moet
           worden verondersteld dat de tijdsaanduiding relatief is tot de mediabron die
-          is vastgelegd onder het top-level element `vergadering`.
+          is vastgelegd onder het top-level `<vergadering>`-element.
     """
 
     aanvang: int | XmlTime
@@ -708,7 +768,7 @@ class AanwezigeDeelnemerGegevens(Serializable):
         neemtDeelAanVergadering (VerwijzingGegevens[0..*]): Verwijzing naar de
           vergadering of deelvergaderingen waar de deelnemer aanwezig was.
         neemtDeelAanStemming (StemGegevens[0..*]): Gegevens over een stem die de
-          deelnemer heeft uitbracht, zoals de stemkeuze en de stemming waarop deze
+          deelnemer heeft uitgebracht, zoals de stemkeuze en de stemming waarop deze
           keuze betrekking heeft.
         spreektTijdensSpreekfragment (SpreekfragmentGegevens[0..*]): Gegevens over een
           spreekfragment waarin de deelnemer sprak, zoals het moment waarop dit
@@ -732,11 +792,11 @@ class AanwezigeDeelnemerGegevens(Serializable):
         fields = super()._ORI_A_ordered_fields()
         return (fields[1],) + fields[2:8] + (fields[0],) + fields[8:]
 
-# TODO: insert your monkeypatch here
 @dataclass
 class ORI_A(Serializable):
     """"""
 
+    # todo: pluralize?
     vergadering: VergaderingGegevens
     agendapunt: AgendapuntGegevens | list[AgendapuntGegevens]
     stemming: StemmingGegevens | list[StemmingGegevens] = None
@@ -829,65 +889,3 @@ class ORI_A(Serializable):
 
         # `|` is a union operator; it merges two dicts, with right-hand side taking precedence
         tree.write(file_or_filename, **(lxml_defaults | lxml_kwargs))
-
-
-# TODO: generate docstrings for these as well (just a list of options is good)
-# TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
-class BesluitResultaatEnum(StrEnum):
-    """"""
-
-    unaniem_aangenomen = "Unaniem aangenomen"
-    aangenomen = "Aangenomen"
-    geamendeerd_aangenomen = "Geamendeerd aangenomen"
-    onder_voorbehoud_aangenomen = "Onder voorbehoud aangenomen"
-    verworpen = "Verworpen"
-    aangehouden = "Aangehouden"
-
-
-class GeslachtsaanduidingEnum(StrEnum):
-    """"""
-
-    man = "Man"
-    vrouw = "Vrouw"
-    anders = "Anders"
-    onbekend = "Onbekend"
-
-
-class KeuzeStemmingEnum(StrEnum):
-    """"""
-
-    tegen = "Tegen"
-    afwezig = "Afwezig"
-    onthouden = "Onthouden"
-
-
-class ResultaatMondelingeStemmingEnum(StrEnum):
-    """"""
-
-    voor = "Voor"
-    tegen = "Tegen"
-    gelijk = "Gelijk"
-
-
-class StemmingTypeEnum(StrEnum):
-    """"""
-
-    hoofdelijk = "Hoofdelijk"
-    regulier = "Regulier"
-    schriftelijk = "Schriftelijk"
-
-
-class FractieStemresultaatEnum(StrEnum):
-    """"""
-
-    aangenomen = "Aangenomen"
-    verworpen = "Verworpen"
-    verdeeld = "Verdeeld"
-
-
-class VergaderingStatusEnum(StrEnum):
-    """"""
-
-    gepland = "Gepland"
-    gehouden = "Gehouden"
-    geannuleerd = "Geannuleerd"
