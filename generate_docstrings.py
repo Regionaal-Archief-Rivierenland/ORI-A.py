@@ -40,12 +40,14 @@ for complex_type in root.findall(".//xs:complexType", namespaces=ns):
     class_docstring = textwrap.fill(
         complex_type.find("./xs:annotation/xs:documentation", namespaces=ns).text,
         width=MAX_WIDTH,
-        subsequent_indent=" "*INDENT
+        subsequent_indent=" " * INDENT,
     )
-    class_docstring += f"\n\n{' '*INDENT}Attributes:\n"
+    class_docstring += f"\n\n{' ' * INDENT}Attributes:\n"
 
     for field in python_ordered_fields:
-        elem = complex_type.find(f"./xs:sequence/xs:element[@name='{field.name}']", namespaces=ns)
+        elem = complex_type.find(
+            f"./xs:sequence/xs:element[@name='{field.name}']", namespaces=ns
+        )
         optional = not int(elem.attrib["minOccurs"])
         repeatable = True if elem.attrib["maxOccurs"] == "unbounded" else False
 
@@ -68,21 +70,26 @@ for complex_type in root.findall(".//xs:complexType", namespaces=ns):
         elif not repeatable and not optional:
             cardinality = "[1..1]"
 
-        field_docstring = elem.find("./xs:annotation/xs:documentation", namespaces=ns).text
+        field_docstring = elem.find(
+            "./xs:annotation/xs:documentation", namespaces=ns
+        ).text
 
         field_docstring = textwrap.fill(
-            f"{field.name} ({field_type_name}{cardinality}): " \
-            f"{field_docstring}",
+            f"{field.name} ({field_type_name}{cardinality}): {field_docstring}",
             width=MAX_WIDTH,
-            initial_indent=" "*(2*INDENT),
-            subsequent_indent=" "*(2*INDENT+2),
+            initial_indent=" " * (2 * INDENT),
+            subsequent_indent=" " * (2 * INDENT + 2),
         )
 
         class_docstring += field_docstring + "\n"
 
-    class_docstring += " "*INDENT
-    docs[class_name[0].lower() + class_name[1:]] = class_docstring
+    class_docstring += " " * INDENT
+
+    # ORI_A is a special case where we don't camelcase
+    if class_name == "ORI_A":
+        docs["ORI_A"] = class_docstring
+    else:
+        docs[class_name[0].lower() + class_name[1:]] = class_docstring
 
 with open("ORI_A/ORI_A.py", "w+") as f:
     f.write(template.render(docs=docs))
-
