@@ -397,11 +397,11 @@ class AanwezigeDeelnemerGegevens(Serializable):
         fields = super()._ORI_A_ordered_fields()
         return (fields[1],) + fields[2:8] + (fields[0],) + fields[8:]
 
-# TODO: insert your monkeypatch here
 @dataclass
 class ORI_A(Serializable):
     """{{docs.ORI_A}}"""
 
+    # todo: pluralize?
     vergadering: VergaderingGegevens
     agendapunt: AgendapuntGegevens | list[AgendapuntGegevens]
     stemming: StemmingGegevens | list[StemmingGegevens] = None
