@@ -42,7 +42,7 @@ def _init_obj(cls: Serializable) -> Serializable:
             if get_origin(field_types[1]) is list:
                 repeatable = True
             else:
-                # non-determinism in tests sucks, but so does keeping track of which types
+                # FIXME: non-determinism in tests sucks, but so does keeping track of which types
                 # you have already supplied to a non-repeatable field
                 field_type = field_types[randint(0, len(field_types)-1)]
                 repeatable = False
@@ -54,6 +54,7 @@ def _init_obj(cls: Serializable) -> Serializable:
             class_args[field.name] = class_dummy_map[field_type]
         elif issubclass(field_type, Serializable):
             class_args[field.name] = _init_obj(field_type)
+        # fixme: how much does this cover
         elif issubclass(field_type, Enum):
             class_args[field.name] = next(iter(field_type)).value
         elif field.name == "ID":
