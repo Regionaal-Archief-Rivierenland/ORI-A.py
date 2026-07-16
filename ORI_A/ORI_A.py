@@ -794,7 +794,34 @@ class AanwezigeDeelnemerGegevens(Serializable):
 
 @dataclass
 class ORI_A(Serializable):
-    """"""
+    """Gegevens die onder het _root_-element `<ORI-A>` komen.
+
+    Attributes:
+        vergadering (VergaderingGegevens[1..1]): Gegevens over de vergadering, zoals de
+          startdatum en locatie.
+        agendapunt (AgendapuntGegevens[1..*]): Gegevens over een agendapunt, zoals het
+          volgnummer en bijbehorende stukken. Bij het ontbreken van volgnummers moet de
+          volgorde van agendapunt-elementen aangeven in welke volgorde ze behandeld
+          zijn.
+        stemming (StemmingGegevens[0..*]): Gegevens over een stemming, zoals het
+          agendapunt of de persoon waarover gestemd is. Iemands stemkeuze op een
+          stemming hoort onder `aanwezigeDeelnemer`.
+        besluit (BesluitGegevens[0..*]): Gegevens over een besluit, zoals of het
+          unaniem aangenomen of verworpen is. Een besluit volgt in de regel op een
+          `stemming`.
+        fractie (FractieGegevens[0..*]): Gegevens over een fractie, zoals de naam en
+          het stemgedrag van de fractie.
+        dagelijksBestuur (DagelijksBestuurGegevens[0..*]): Gegevens over een dagelijks
+          bestuur, zoals de naam van het bestuur.
+        persoonBuitenVergadering (NatuurlijkPersoonGegevens[0..*]): Gegevens over een
+          persoon die een relatie heeft met de vergadering, maar _niet_ zelf aanwezig
+          was. Dit kan bijvoorbeeld een portefeuillehouder, indiener of afwezig
+          raadslid zijn. Persoonsgegevens over aanwezigen komen onder
+          `aanwezigeDeelnemer`.
+        aanwezigeDeelnemer (AanwezigeDeelnemerGegevens[0..*]): Gegevens over een
+          persoon die bij de vergadering aanwezig was, zoals diens stemgedrag,
+          inspreekmomenten en meer algemene persoonsgegevens.
+    """
 
     # todo: pluralize?
     vergadering: VergaderingGegevens
