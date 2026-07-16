@@ -28,13 +28,10 @@ docs = {}
 for complex_type in root.findall(".//xs:complexType", namespaces=ns):
     type_name = complex_type.get("name")
 
-    # FIXME: the complexType under ORI-A currently has no associated name
-    if not type_name:
-        print("skipping")
-        continue
-
     # classes are UpperCamelCase
     class_name = type_name[0].upper() + type_name[1:]
+    # python names can't have hyphens
+    class_name = class_name.replace("-", "_")
 
     # get class from module
     cls = getattr(ORI_A, class_name)
