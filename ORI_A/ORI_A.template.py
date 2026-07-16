@@ -498,6 +498,7 @@ class ORI_A(Serializable):
 
 # TODO: generate docstrings for these as well (just a list of options is good)
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
+# TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
 class BesluitResultaatEnum(StrEnum):
     """{{docs.besluitResultaatEnum}}"""
 
