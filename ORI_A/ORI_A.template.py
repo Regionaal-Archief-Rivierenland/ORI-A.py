@@ -7,6 +7,67 @@ from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
 import lxml.etree as ET
 
+# TODO: generate docstrings for these as well (just a list of options is good)
+# TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
+# TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
+class BesluitResultaatEnum(StrEnum):
+    """{{docs.besluitResultaatEnum}}"""
+
+    unaniem_aangenomen = "Unaniem aangenomen"
+    aangenomen = "Aangenomen"
+    geamendeerd_aangenomen = "Geamendeerd aangenomen"
+    onder_voorbehoud_aangenomen = "Onder voorbehoud aangenomen"
+    verworpen = "Verworpen"
+    aangehouden = "Aangehouden"
+
+
+class GeslachtsaanduidingEnum(StrEnum):
+    """{{docs.geslachtsaanduidingEnum}}"""
+
+    man = "Man"
+    vrouw = "Vrouw"
+    anders = "Anders"
+    onbekend = "Onbekend"
+
+
+class KeuzeStemmingEnum(StrEnum):
+    """{{docs.keuzeStemmingEnum}}"""
+
+    tegen = "Tegen"
+    afwezig = "Afwezig"
+    onthouden = "Onthouden"
+
+
+class ResultaatMondelingeStemmingEnum(StrEnum):
+    """{{docs.resultaatMondelingeStemmingEnum}}"""
+
+    voor = "Voor"
+    tegen = "Tegen"
+    gelijk = "Gelijk"
+
+
+class StemmingTypeEnum(StrEnum):
+    """{{docs.stemmingTypeEnum}}"""
+
+    hoofdelijk = "Hoofdelijk"
+    regulier = "Regulier"
+    schriftelijk = "Schriftelijk"
+
+
+class FractieStemresultaatEnum(StrEnum):
+    """{{docs.fractieStemresultaatEnum}}"""
+
+    aangenomen = "Aangenomen"
+    verworpen = "Verworpen"
+    verdeeld = "Verdeeld"
+
+
+class VergaderingStatusEnum(StrEnum):
+    """{{docs.vergaderingStatusEnum}}"""
+
+    gepland = "Gepland"
+    gehouden = "Gehouden"
+    geannuleerd = "Geannuleerd"
 
 class Serializable:
     @classmethod
@@ -494,66 +555,3 @@ class ORI_A(Serializable):
 
         # `|` is a union operator; it merges two dicts, with right-hand side taking precedence
         tree.write(file_or_filename, **(lxml_defaults | lxml_kwargs))
-
-
-# TODO: generate docstrings for these as well (just a list of options is good)
-# TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
-# TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
-class BesluitResultaatEnum(StrEnum):
-    """{{docs.besluitResultaatEnum}}"""
-
-    unaniem_aangenomen = "Unaniem aangenomen"
-    aangenomen = "Aangenomen"
-    geamendeerd_aangenomen = "Geamendeerd aangenomen"
-    onder_voorbehoud_aangenomen = "Onder voorbehoud aangenomen"
-    verworpen = "Verworpen"
-    aangehouden = "Aangehouden"
-
-
-class GeslachtsaanduidingEnum(StrEnum):
-    """{{docs.geslachtsaanduidingEnum}}"""
-
-    man = "Man"
-    vrouw = "Vrouw"
-    anders = "Anders"
-    onbekend = "Onbekend"
-
-
-class KeuzeStemmingEnum(StrEnum):
-    """{{docs.keuzeStemmingEnum}}"""
-
-    tegen = "Tegen"
-    afwezig = "Afwezig"
-    onthouden = "Onthouden"
-
-
-class ResultaatMondelingeStemmingEnum(StrEnum):
-    """{{docs.resultaatMondelingeStemmingEnum}}"""
-
-    voor = "Voor"
-    tegen = "Tegen"
-    gelijk = "Gelijk"
-
-
-class StemmingTypeEnum(StrEnum):
-    """{{docs.stemmingTypeEnum}}"""
-
-    hoofdelijk = "Hoofdelijk"
-    regulier = "Regulier"
-    schriftelijk = "Schriftelijk"
-
-
-class FractieStemresultaatEnum(StrEnum):
-    """{{docs.fractieStemresultaatEnum}}"""
-
-    aangenomen = "Aangenomen"
-    verworpen = "Verworpen"
-    verdeeld = "Verdeeld"
-
-
-class VergaderingStatusEnum(StrEnum):
-    """{{docs.vergaderingStatusEnum}}"""
-
-    gepland = "Gepland"
-    gehouden = "Gehouden"
-    geannuleerd = "Geannuleerd"
