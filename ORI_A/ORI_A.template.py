@@ -1,13 +1,12 @@
 import dataclasses
 import json
-
 from dataclasses import Field, dataclass
 from enum import StrEnum
-import helpers
 
+import helpers
+import lxml.etree as ET
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
-import lxml.etree as ET
 
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
 # TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
