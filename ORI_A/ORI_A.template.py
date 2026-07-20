@@ -69,6 +69,7 @@ class VergaderingStatus(StrEnum):
     gehouden = "Gehouden"
     geannuleerd = "Geannuleerd"
 
+
 class Serializable:
     @classmethod
     def _ORI_A_ordered_fields(cls) -> tuple[Field]:
@@ -118,7 +119,7 @@ class Serializable:
                     ET.SubElement(root_elem, field_name).text = str(val).lower()
                 else:
                     ET.SubElement(root_elem, field_name).text = str(val)
-                    
+
         return root_elem
 
     # Think this maybe should be something done in (post)init? thay way you can make it a property
@@ -134,6 +135,7 @@ class Serializable:
         d = dataclasses.asdict(self, dict_factory=strip_none)
         aliased = {self._ori_aliases()[k]: v for k, v in d.items()}
         return json.dumps(aliased)
+
 
 @dataclass
 class GremiumGegevens(Serializable):
@@ -245,6 +247,7 @@ class FractielidmaatschapGegevens(Serializable):
         fields = super()._ORI_A_ordered_fields()
         return fields[1:-1] + (fields[0],)
 
+
 @dataclass
 class StemGegevens(Serializable):
     """{{docs.stemGegevens}}"""
@@ -269,6 +272,7 @@ class StemresultaatPerFractieGegevens(Serializable):
     def _ORI_A_ordered_fields(self) -> tuple[Field]:
         fields = super()._ORI_A_ordered_fields()
         return (fields[-1], fields[0], fields[1])
+
 
 @dataclass
 class DagelijksBestuurGegevens(Serializable):
@@ -315,6 +319,7 @@ class NatuurlijkPersoonGegevens(Serializable):
     isLidVanFractie: FractielidmaatschapGegevens = None
     isLidVanDagelijksBestuur: DagelijksBestuurLidmaatschapGegevens = None
 
+
 @dataclass
 class StemmingGegevens(Serializable):
     """{{docs.stemmingGegevens}}"""
@@ -337,7 +342,6 @@ class StemmingGegevens(Serializable):
         return (fields[0], fields[2]) + fields[3:7] + (fields[1], fields[-1])
 
 
-
 @dataclass
 class TijdsaanduidingGegevens(Serializable):
     """{{docs.tijdsaanduidingGegevens}}"""
@@ -350,21 +354,24 @@ class TijdsaanduidingGegevens(Serializable):
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps."""
 
         if not isinstance(self.aanvang, int):
-            raise TypeError(f"TijdsaanduidingGegevens.aanvang must be an integer ({type(self.aanvang)})")
+            raise TypeError(
+                f"TijdsaanduidingGegevens.aanvang must be an integer ({type(self.aanvang)})"
+            )
 
         if self.einde and not isinstance(self.einde, int):
-            raise TypeError(f"TijdsaanduidingGegevens.einde must be an integer (found {type(self.einde)})")
+            raise TypeError(
+                f"TijdsaanduidingGegevens.einde must be an integer (found {type(self.einde)})"
+            )
 
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
         if self.einde:
             self.einde = helpers.integer_to_timestamp(self.einde)
 
-
-
     def timestamps_to_integers(self) -> None:
         """Convert hh:mm:ss timestamps in `aanvang` and `einde` to integers."""
         pass
+
 
 @dataclass
 class VergaderingGegevens(Serializable):
@@ -469,6 +476,7 @@ class AanwezigeDeelnemerGegevens(Serializable):
     def _ORI_A_ordered_fields(self) -> tuple[Field]:
         fields = super()._ORI_A_ordered_fields()
         return (fields[1],) + fields[2:8] + (fields[0],) + fields[8:]
+
 
 @dataclass
 class ORI_A(Serializable):
