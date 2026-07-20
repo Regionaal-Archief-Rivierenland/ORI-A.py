@@ -351,10 +351,10 @@ class TijdsaanduidingGegevens(Serializable):
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps."""
 
         if not isinstance(self.aanvang, int):
-            raise TypeError("TijdsaanduidingGegevens.aanvang is not an integer")
+            raise TypeError(f"TijdsaanduidingGegevens.aanvang must be an integer ({type(self.aanvang)})")
 
         if self.einde is not None and not isinstance(self.einde, int):
-            raise TypeError("TijdsaanduidingGegevens.einde is not an integer")
+            raise TypeError(f"TijdsaanduidingGegevens.einde must be an integer (found {type(self.einde)})")
 
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
