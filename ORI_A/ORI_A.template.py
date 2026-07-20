@@ -351,18 +351,11 @@ class TijdsaanduidingGegevens(Serializable):
     isRelatiefTot: InformatieobjectGegevens = None
 
     def integers_to_timestamps(self) -> None:
-        """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps."""
+        """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps.
 
-        if not isinstance(self.aanvang, int):
-            raise TypeError(
-                f"TijdsaanduidingGegevens.aanvang must be an integer ({type(self.aanvang)})"
-            )
-
-        if self.einde and not isinstance(self.einde, int):
-            raise TypeError(
-                f"TijdsaanduidingGegevens.einde must be an integer (found {type(self.einde)})"
-            )
-
+        Raises:
+            TypeError: `aanvang` or `einde` contains a non-integer type
+        """
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
         if self.einde:
