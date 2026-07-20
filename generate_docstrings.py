@@ -1,10 +1,10 @@
 #!/bin/python
 
 import dataclasses
-import xml.etree.ElementTree as ET
 import sys
 import ORI_A
 import textwrap
+import lxml.etree as ET
 import annotationlib
 from typing import Union, get_origin, get_args
 
@@ -90,6 +90,20 @@ for complex_type in root.findall(".//xs:complexType", namespaces=ns):
         docs["ORI_A"] = class_docstring
     else:
         docs[class_name[0].lower() + class_name[1:]] = class_docstring
+
+
+enumeraties = {
+    e.getparent().getparent()
+    for e in root.findall(".//xs:enumeration", namespaces=ns)
+}
+for enum in enumeraties:
+    docstring = "Enumeratie met de volgende keuzemogelijkheden:\n\n"
+    for optie in enum.findall(".//xs:enumeration", namespaces=ns):
+        docstring += f"    * {optie.attrib['value']}\n"
+
+    docs[enum.attrib["name"]] = docstring + " " * INDENT
+
+
 
 with open("ORI_A/ORI_A.py", "w+") as f:
     f.write(template.render(docs=docs))

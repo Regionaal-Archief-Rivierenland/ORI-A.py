@@ -11,8 +11,16 @@ import lxml.etree as ET
 # TODO: generate docstrings for these as well (just a list of options is good)
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
 # TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
-class BesluitResultaatEnum(StrEnum):
-    """"""
+class BesluitResultaat(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Unaniem aangenomen
+    * Aangenomen
+    * Geamendeerd aangenomen
+    * Onder voorbehoud aangenomen
+    * Verworpen
+    * Aangehouden
+    """
 
     unaniem_aangenomen = "Unaniem aangenomen"
     aangenomen = "Aangenomen"
@@ -22,8 +30,14 @@ class BesluitResultaatEnum(StrEnum):
     aangehouden = "Aangehouden"
 
 
-class GeslachtsaanduidingEnum(StrEnum):
-    """"""
+class Geslachtsaanduiding(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Man
+    * Vrouw
+    * Anders
+    * Onbekend
+    """
 
     man = "Man"
     vrouw = "Vrouw"
@@ -31,40 +45,66 @@ class GeslachtsaanduidingEnum(StrEnum):
     onbekend = "Onbekend"
 
 
-class KeuzeStemmingEnum(StrEnum):
-    """"""
+class KeuzeStemming(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Voor
+    * Tegen
+    * Afwezig
+    * Onthouden
+    """
 
     tegen = "Tegen"
     afwezig = "Afwezig"
     onthouden = "Onthouden"
 
 
-class ResultaatMondelingeStemmingEnum(StrEnum):
-    """"""
+class ResultaatMondelingeStemming(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Voor
+    * Tegen
+    * Gelijk
+    """
 
     voor = "Voor"
     tegen = "Tegen"
     gelijk = "Gelijk"
 
 
-class StemmingTypeEnum(StrEnum):
-    """"""
+class Stemmingstype(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Hoofdelijk
+    * Regulier
+    * Schriftelijk
+    """
 
     hoofdelijk = "Hoofdelijk"
     regulier = "Regulier"
     schriftelijk = "Schriftelijk"
 
 
-class FractieStemresultaatEnum(StrEnum):
-    """"""
+class FractieStemresultaat(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Aangenomen
+    * Verworpen
+    * Verdeeld
+    """
 
     aangenomen = "Aangenomen"
     verworpen = "Verworpen"
     verdeeld = "Verdeeld"
 
 
-class VergaderingStatusEnum(StrEnum):
-    """"""
+class VergaderingStatus(StrEnum):
+    """Enumeratie met de volgende keuzemogelijkheden:
+
+    * Gepland
+    * Gehouden
+    * Geannuleerd
+    """
 
     gepland = "Gepland"
     gehouden = "Gehouden"

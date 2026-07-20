@@ -1,4 +1,5 @@
 import dataclasses
+import json
 
 from dataclasses import Field, dataclass
 from enum import StrEnum
@@ -7,11 +8,10 @@ from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
 import lxml.etree as ET
 
-# TODO: generate docstrings for these as well (just a list of options is good)
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
 # TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
-class BesluitResultaatEnum(StrEnum):
-    """{{docs.besluitResultaatEnum}}"""
+class BesluitResultaat(StrEnum):
+    """{{docs.besluitResultaat}}"""
 
     unaniem_aangenomen = "Unaniem aangenomen"
     aangenomen = "Aangenomen"
@@ -21,8 +21,8 @@ class BesluitResultaatEnum(StrEnum):
     aangehouden = "Aangehouden"
 
 
-class GeslachtsaanduidingEnum(StrEnum):
-    """{{docs.geslachtsaanduidingEnum}}"""
+class Geslachtsaanduiding(StrEnum):
+    """{{docs.geslachtsaanduiding}}"""
 
     man = "Man"
     vrouw = "Vrouw"
@@ -30,40 +30,40 @@ class GeslachtsaanduidingEnum(StrEnum):
     onbekend = "Onbekend"
 
 
-class KeuzeStemmingEnum(StrEnum):
-    """{{docs.keuzeStemmingEnum}}"""
+class KeuzeStemming(StrEnum):
+    """{{docs.keuzeStemming}}"""
 
     tegen = "Tegen"
     afwezig = "Afwezig"
     onthouden = "Onthouden"
 
 
-class ResultaatMondelingeStemmingEnum(StrEnum):
-    """{{docs.resultaatMondelingeStemmingEnum}}"""
+class ResultaatMondelingeStemming(StrEnum):
+    """{{docs.resultaatMondelingeStemming}}"""
 
     voor = "Voor"
     tegen = "Tegen"
     gelijk = "Gelijk"
 
 
-class StemmingTypeEnum(StrEnum):
-    """{{docs.stemmingTypeEnum}}"""
+class Stemmingstype(StrEnum):
+    """{{docs.stemmingstype}}"""
 
     hoofdelijk = "Hoofdelijk"
     regulier = "Regulier"
     schriftelijk = "Schriftelijk"
 
 
-class FractieStemresultaatEnum(StrEnum):
-    """{{docs.fractieStemresultaatEnum}}"""
+class FractieStemresultaat(StrEnum):
+    """{{docs.fractieStemresultaat}}"""
 
     aangenomen = "Aangenomen"
     verworpen = "Verworpen"
     verdeeld = "Verdeeld"
 
 
-class VergaderingStatusEnum(StrEnum):
-    """{{docs.vergaderingStatusEnum}}"""
+class VergaderingStatus(StrEnum):
+    """{{docs.vergaderingStatus}}"""
 
     gepland = "Gepland"
     gehouden = "Gehouden"
@@ -121,6 +121,19 @@ class Serializable:
                     
         return root_elem
 
+    # Think this maybe should be something done in (post)init? thay way you can make it a property
+    def _ori_aliases(self) -> dict[str, str]:
+        """Override this function when property names in ORI and ORI-A differ"""
+        return {f.name: f.name for f in dataclasses.fields(self)}
+
+    # note: the performance of all of this is not amazing. To fix this, we must precompute stuff
+    def to_ori_json(self) -> str:
+        strip_none = lambda d: {k: v for k, v in d if v is not None}
+        # FIXME: asdict is not "recursive". Other Serializables/dataclasses are treated as dicts.
+        # I think this causes self._ori_aliases() in subclasses to be ignored.
+        d = dataclasses.asdict(self, dict_factory=strip_none)
+        aliased = {self._ori_aliases()[k]: v for k, v in d.items()}
+        return json.dumps(aliased)
 
 @dataclass
 class GremiumGegevens(Serializable):
@@ -128,6 +141,10 @@ class GremiumGegevens(Serializable):
 
     naam: str
     identificatie: str = None
+
+    # instead of complex system with aliases and transformers, maybe just override a single method?
+    def _ori_aliases(self):
+        return {"naam": "gremiumnaam", "identificatie": "gremiumidentificatie"}
 
 
 @dataclass
