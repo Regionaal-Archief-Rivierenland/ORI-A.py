@@ -353,7 +353,7 @@ class TijdsaanduidingGegevens(Serializable):
         if not isinstance(self.aanvang, int):
             raise TypeError(f"TijdsaanduidingGegevens.aanvang must be an integer ({type(self.aanvang)})")
 
-        if self.einde is not None and not isinstance(self.einde, int):
+        if self.einde and not isinstance(self.einde, int):
             raise TypeError(f"TijdsaanduidingGegevens.einde must be an integer (found {type(self.einde)})")
 
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
