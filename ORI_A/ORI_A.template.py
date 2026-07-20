@@ -350,7 +350,7 @@ class TijdsaanduidingGegevens(Serializable):
     einde: int | XmlTime = None
     isRelatiefTot: InformatieobjectGegevens = None
 
-    # TODO: is it correct to put a "Raises:" block here? When should you use one anyways
+    # TODO: is it common to put a "Raises:" block here? When should you use one anyways?
     def integers_to_timestamps(self) -> None:
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps.
 
