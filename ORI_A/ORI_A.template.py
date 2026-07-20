@@ -350,6 +350,7 @@ class TijdsaanduidingGegevens(Serializable):
     einde: int | XmlTime = None
     isRelatiefTot: InformatieobjectGegevens = None
 
+    # TODO: is it correct to put a "Raises:" block here? When should you use one anyways
     def integers_to_timestamps(self) -> None:
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps.
 
@@ -362,8 +363,16 @@ class TijdsaanduidingGegevens(Serializable):
             self.einde = helpers.integer_to_timestamp(self.einde)
 
     def timestamps_to_integers(self) -> None:
-        """Convert hh:mm:ss timestamps in `aanvang` and `einde` to integers."""
-        pass
+        """Convert hh:mm:ss timestamps in `aanvang` and `einde` to integers.
+
+        Raises:
+            ValueError: Found malformed timestamp
+        """
+        self.aanvang = helpers.timestamp_to_integer(self.aanvang)
+
+        if self.einde:
+            self.einde = helpers.timestamp_to_integer(self.einde)
+
 
 
 @dataclass
