@@ -358,8 +358,6 @@ class TijdsaanduidingGegevens(Serializable):
 
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
-        if self.einde is not None:
-            self.einde = _integer_to_timestamp(self.einde)
         if self.einde:
             self.einde = helpers.integer_to_timestamp(self.einde)
 
