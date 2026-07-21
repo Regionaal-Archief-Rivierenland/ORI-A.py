@@ -99,10 +99,9 @@ enumeraties = {
 for enum in enumeraties:
     docstring = "Enumeratie met de volgende keuzemogelijkheden:\n\n"
     for optie in enum.findall(".//xs:enumeration", namespaces=ns):
-        docstring += f"    * {optie.attrib['value']}\n"
+        docstring += f"{" "*INDENT}* {optie.attrib['value']}\n"
 
     docs[enum.attrib["name"]] = docstring + " " * INDENT
-
 
 
 with open("ORI_A/ORI_A.py", "w+") as f:
