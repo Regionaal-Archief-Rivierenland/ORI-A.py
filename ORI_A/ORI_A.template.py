@@ -211,7 +211,7 @@ class BesluitGegevens(Serializable):
     """{{docs.besluitGegevens}}"""
 
     ID: str | list[str]
-    resultaat: BesluitResultaatEnum
+    resultaat: BesluitResultaat
     toelichting: str = None
     toezegging: str = None
 
@@ -252,7 +252,7 @@ class FractielidmaatschapGegevens(Serializable):
 class StemGegevens(Serializable):
     """{{docs.stemGegevens}}"""
 
-    keuzeStemming: KeuzeStemmingEnum
+    keuzeStemming: KeuzeStemming
     gegevenOpStemming: VerwijzingGegevens
     ID: str | list[str] = None
 
@@ -265,7 +265,7 @@ class StemGegevens(Serializable):
 class StemresultaatPerFractieGegevens(Serializable):
     """{{docs.stemresultaatPerFractieGegevens}}"""
 
-    fractieStemresultaat: FractieStemresultaatEnum
+    fractieStemresultaat: FractieStemresultaat
     verwijzingStemming: VerwijzingGegevens
     ID: str | list[str] = None
 
@@ -313,7 +313,7 @@ class NatuurlijkPersoonGegevens(Serializable):
 
     ID: str | list[str]
     naam: NaamGegevens
-    geslachtsaanduiding: GeslachtsaanduidingEnum = None
+    geslachtsaanduiding: Geslachtsaanduiding = None
     functie: BegripGegevens = None
     nevenfunctie: NevenfunctieGegevens | list[NevenfunctieGegevens] = None
     isLidVanFractie: FractielidmaatschapGegevens = None
@@ -326,8 +326,8 @@ class StemmingGegevens(Serializable):
 
     ID: str | list[str]
     heeftBetrekkingOpAgendapunt: VerwijzingGegevens
-    type: StemmingTypeEnum = None
-    resultaatMondelingeStemming: ResultaatMondelingeStemmingEnum = None
+    type: Stemmingstype = None
+    resultaatMondelingeStemming: ResultaatMondelingeStemming = None
     resultaatStemmingOverPersonen: str = None
     stemmingOverPersonen: (
         StemmingOverPersonenGegevens | list[StemmingOverPersonenGegevens]
@@ -393,7 +393,7 @@ class VergaderingGegevens(Serializable):
     georganiseerdDoorGremium: GremiumGegevens = None
     locatie: str = None
     weblocatie: str = None
-    status: VergaderingStatusEnum = None
+    status: VergaderingStatus = None
     overheidsorgaan: BegripGegevens = None
     isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = (
         None
