@@ -3,7 +3,7 @@ import json
 from dataclasses import Field, dataclass
 from enum import StrEnum
 
-import helpers
+from . import helpers
 import lxml.etree as ET
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
