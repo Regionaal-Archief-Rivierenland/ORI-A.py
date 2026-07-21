@@ -3,7 +3,7 @@ default: build
 build:
     touch ORI_A/ORI_A.py
     # ensure file is syntactically correct before rendering
-    python ORI_A/ORI_A.template.py || exit 1
+    python -m py_compile ORI_A/ORI_A.template.py
     # make file temporarily writeable
     chmod u+w ORI_A/ORI_A.py
     ./generate_docstrings.py ORI-A-XSD/ORI-A.xsd "ORI_A/ORI_A.template.py"
