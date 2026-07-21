@@ -8,5 +8,6 @@ Voor nu:
 
 ``` shell
 git clone https://github.com/Regionaal-Archief-Rivierenland/ori-a.py
-sudo pip install . # of laat sudo weg als je op Windows zit/weet wat je doet
+cd ori-a.py
+sudo pip install . # Windows gebruikers kunnen "sudo" hier weglaten
 ```
