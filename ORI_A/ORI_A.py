@@ -1,13 +1,12 @@
 import dataclasses
 import json
-
 from dataclasses import Field, dataclass
 from enum import StrEnum
-import helpers
 
+from . import helpers
+import lxml.etree as ET
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlTime
 
-import lxml.etree as ET
 
 # TODO: maybe make the case match values? (or give options for both; and/or add a UPPER_CASE variant)
 # TODO: maybe move these to their own submodule? ORI_A.enumerations.BesluitResultaat.verworpen may read better
@@ -110,6 +109,7 @@ class VergaderingStatus(StrEnum):
     gehouden = "Gehouden"
     geannuleerd = "Geannuleerd"
 
+
 class Serializable:
     @classmethod
     def _ORI_A_ordered_fields(cls) -> tuple[Field]:
@@ -159,7 +159,7 @@ class Serializable:
                     ET.SubElement(root_elem, field_name).text = str(val).lower()
                 else:
                     ET.SubElement(root_elem, field_name).text = str(val)
-                    
+
         return root_elem
 
     # Think this maybe should be something done in (post)init? thay way you can make it a property
@@ -175,6 +175,7 @@ class Serializable:
         d = dataclasses.asdict(self, dict_factory=strip_none)
         aliased = {self._ori_aliases()[k]: v for k, v in d.items()}
         return json.dumps(aliased)
+
 
 @dataclass
 class GremiumGegevens(Serializable):
@@ -319,7 +320,7 @@ class BesluitGegevens(Serializable):
     """
 
     ID: str | list[str]
-    resultaat: BesluitResultaatEnum
+    resultaat: BesluitResultaat
     toelichting: str = None
     toezegging: str = None
 
@@ -377,6 +378,7 @@ class FractielidmaatschapGegevens(Serializable):
         fields = super()._ORI_A_ordered_fields()
         return fields[1:-1] + (fields[0],)
 
+
 @dataclass
 class StemGegevens(Serializable):
     """Gegevens over een stem die iemand heeft uitgebracht, zoals diens stemkeuze en de
@@ -389,7 +391,7 @@ class StemGegevens(Serializable):
         ID (str[0..*]): Uniek identificatiekenmerk van de stem.
     """
 
-    keuzeStemming: KeuzeStemmingEnum
+    keuzeStemming: KeuzeStemming
     gegevenOpStemming: VerwijzingGegevens
     ID: str | list[str] = None
 
@@ -411,13 +413,14 @@ class StemresultaatPerFractieGegevens(Serializable):
         ID (str[0..*]): Uniek identificatiekenmerk van het stemresultaat per fractie.
     """
 
-    fractieStemresultaat: FractieStemresultaatEnum
+    fractieStemresultaat: FractieStemresultaat
     verwijzingStemming: VerwijzingGegevens
     ID: str | list[str] = None
 
     def _ORI_A_ordered_fields(self) -> tuple[Field]:
         fields = super()._ORI_A_ordered_fields()
         return (fields[-1], fields[0], fields[1])
+
 
 @dataclass
 class DagelijksBestuurGegevens(Serializable):
@@ -500,11 +503,12 @@ class NatuurlijkPersoonGegevens(Serializable):
 
     ID: str | list[str]
     naam: NaamGegevens
-    geslachtsaanduiding: GeslachtsaanduidingEnum = None
+    geslachtsaanduiding: Geslachtsaanduiding = None
     functie: BegripGegevens = None
     nevenfunctie: NevenfunctieGegevens | list[NevenfunctieGegevens] = None
     isLidVanFractie: FractielidmaatschapGegevens = None
     isLidVanDagelijksBestuur: DagelijksBestuurLidmaatschapGegevens = None
+
 
 @dataclass
 class StemmingGegevens(Serializable):
@@ -532,8 +536,8 @@ class StemmingGegevens(Serializable):
 
     ID: str | list[str]
     heeftBetrekkingOpAgendapunt: VerwijzingGegevens
-    type: StemmingTypeEnum = None
-    resultaatMondelingeStemming: ResultaatMondelingeStemmingEnum = None
+    type: Stemmingstype = None
+    resultaatMondelingeStemming: ResultaatMondelingeStemming = None
     resultaatStemmingOverPersonen: str = None
     stemmingOverPersonen: (
         StemmingOverPersonenGegevens | list[StemmingOverPersonenGegevens]
@@ -546,7 +550,6 @@ class StemmingGegevens(Serializable):
     def _ORI_A_ordered_fields(self) -> tuple[Field]:
         fields = super()._ORI_A_ordered_fields()
         return (fields[0], fields[2]) + fields[3:7] + (fields[1], fields[-1])
-
 
 
 @dataclass
@@ -575,25 +578,30 @@ class TijdsaanduidingGegevens(Serializable):
     einde: int | XmlTime = None
     isRelatiefTot: InformatieobjectGegevens = None
 
+    # TODO: is it common to put a "Raises:" block here? When should you use one anyways?
     def integers_to_timestamps(self) -> None:
-        """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps."""
+        """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps.
 
-        if not isinstance(self.aanvang, int):
-            raise TypeError("TijdsaanduidingGegevens.aanvang is not an integer")
-
-        if self.einde is not None and not isinstance(self.einde, int):
-            raise TypeError("TijdsaanduidingGegevens.einde is not an integer")
-
+        Raises:
+            TypeError: `aanvang` or `einde` contains a non-integer type
+        """
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
-        if self.einde is not None:
+        if self.einde:
             self.einde = helpers.integer_to_timestamp(self.einde)
 
-
-
     def timestamps_to_integers(self) -> None:
-        """Convert hh:mm:ss timestamps in `aanvang` and `einde` to integers."""
-        pass
+        """Convert hh:mm:ss timestamps in `aanvang` and `einde` to integers.
+
+        Raises:
+            ValueError: Found malformed timestamp
+        """
+        self.aanvang = helpers.timestamp_to_integer(self.aanvang)
+
+        if self.einde:
+            self.einde = helpers.timestamp_to_integer(self.einde)
+
+
 
 @dataclass
 class VergaderingGegevens(Serializable):
@@ -654,7 +662,7 @@ class VergaderingGegevens(Serializable):
     georganiseerdDoorGremium: GremiumGegevens = None
     locatie: str = None
     weblocatie: str = None
-    status: VergaderingStatusEnum = None
+    status: VergaderingStatus = None
     overheidsorgaan: BegripGegevens = None
     isVastgelegdMiddels: InformatieobjectGegevens | list[InformatieobjectGegevens] = (
         None
@@ -826,6 +834,7 @@ class AanwezigeDeelnemerGegevens(Serializable):
     def _ORI_A_ordered_fields(self) -> tuple[Field]:
         fields = super()._ORI_A_ordered_fields()
         return (fields[1],) + fields[2:8] + (fields[0],) + fields[8:]
+
 
 @dataclass
 class ORI_A(Serializable):
