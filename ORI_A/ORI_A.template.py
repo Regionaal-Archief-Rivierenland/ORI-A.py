@@ -355,7 +355,7 @@ class TijdsaanduidingGegevens(Serializable):
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps.
 
         Raises:
-            TypeError: `aanvang` or `einde` contains a non-integer type
+            TypeError: `aanvang` or `einde` contains non-integer type
         """
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
