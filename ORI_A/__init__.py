@@ -31,6 +31,9 @@ from .ORI_A import (
     VerwijzingGegevens,
 )
 
+from . import begrippenlijsten
+
+
 __all__ = [
     "ORI_A",
     "AanwezigeDeelnemerGegevens",

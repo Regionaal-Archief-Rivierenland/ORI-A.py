@@ -1,0 +1,52 @@
+from ORI_A import BegripGegevens as _BegripGegevens
+from ORI_A import VerwijzingGegevens as _VerwijzingGegevens
+
+class _Begrippenlijst(type):
+    # For some reason, we need a metaclass to do this
+    """Implements iteration through all posible values in a enumeration, as well
+    as containment checking (the `in` operator)."""
+    def __iter__(begrippenlijst_cls):
+        # we need if isinstance(...) because vars() returns a bunch of stuff
+        return (v for v in vars(begrippenlijst_cls).values() if isinstance(v, _BegripGegevens))
+
+    # TODO: maybe something like `"video" in Mediabrontypes` should also work?
+    def __contains__(begrippenlijst_cls, begrip: _BegripGegevens):
+        label_normalized = begrippenlijst_cls._alt_labels.get(
+            begrip.begripLabel, begrip.begripLabel
+        )
+
+        # as long as there is no canonical code, or at least one implemented by
+        # this module, checking the value of begripCode will only create problems
+        # TODO: add code check logic when codes are canonicalized
+        soft_equiv = lambda b1, b2: (
+            label_normalized == b2.begripLabel
+            and b1.verwijzingBegrippenlijst.verwijzingID == b2.verwijzingBegrippenlijst.verwijzingID
+        )
+        return any(soft_equiv(begrip, b) for b in begrippenlijst_cls)
+
+    # TODO: during validation, maybe add check that returns close matches on error? 
+
+{% for begrippenlijst in begrippenlijsten %}
+class {{begrippenlijst.cls_naam}}(metaclass=_Begrippenlijst):
+    """
+    {{begrippenlijst.omschrijving | wordwrap(80)}}
+
+    Attributes:
+        {%- for begrip in begrippenlijst.begrippen if not begrip.deprecated %}
+        {%- set alt_labels = begrippenlijst.alt_labels.get(begrip.label) %}
+        {{begrip.naam}}: {% filter wordwrap(50) | indent(9) -%}
+        {{begrip.definitie}}{% if alt_labels %} (ook wel {{ alt_labels | join(", ") }}){% endif %}
+        {%- endfilter %}
+        {%- endfor %}
+    """
+    {%- for begrip in begrippenlijst.begrippen if not begrip.deprecated %}
+    {{begrip.naam}} = _BegripGegevens(
+        "{{begrip.label}}",
+        _VerwijzingGegevens("{{begrippenlijst.url}}", "ORI-A {{begrippenlijst.naam}}")
+    )
+    """{{begrip.definitie}}"""
+    {%- endfor %}
+    {# we need to keep track of what alt labels exists for validation purposes #}
+    _alt_labels = {{begrippenlijst.alt_labels}}
+
+{% endfor %}
