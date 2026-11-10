@@ -314,7 +314,7 @@ class BesluitGegevens(Serializable):
 
     Attributes:
         ID (str[1..*]): Uniek identificatiekenmerk van het besluit.
-        resultaat (BesluitResultaatEnum[1..1]): Het resultaat van het besluit.
+        resultaat (BesluitResultaat[1..1]): Het resultaat van het besluit.
         toelichting (str[0..1]): Een toelichting op het besluit.
         toezegging (str[0..1]): Een toezegging die bij het besluit gedaan is.
     """
@@ -385,7 +385,7 @@ class StemGegevens(Serializable):
     stemming waarop deze keuze betrekking heeft.
 
     Attributes:
-        keuzeStemming (KeuzeStemmingEnum[1..1]): De keuze op de stemming.
+        keuzeStemming (KeuzeStemming[1..1]): De keuze op de stemming.
         gegevenOpStemming (VerwijzingGegevens[1..1]): Verwijzing naar de stemming waar
           de stem betrekking op heeft.
         ID (str[0..*]): Uniek identificatiekenmerk van de stem.
@@ -406,8 +406,8 @@ class StemresultaatPerFractieGegevens(Serializable):
     aanwezigen leden unaniem voor, unaniem tegen, of juist verdeeld hebben gestemd.
 
     Attributes:
-        fractieStemresultaat (FractieStemresultaatEnum[1..1]): Geeft aan hoe de fractie
-          als geheel tegenover een stemming stond.
+        fractieStemresultaat (FractieStemresultaat[1..1]): Geeft aan hoe de fractie als
+          geheel tegenover een stemming stond.
         verwijzingStemming (VerwijzingGegevens[1..1]): Verwijzing naar de stemming waar
           de fractie aan heeft deelgenomen.
         ID (str[0..*]): Uniek identificatiekenmerk van het stemresultaat per fractie.
@@ -490,7 +490,7 @@ class NatuurlijkPersoonGegevens(Serializable):
         ID (str[1..*]): Uniek identificatiekenmerk van de persoon.
         naam (NaamGegevens[1..1]): Gegevens over de naam van de persoon, zoals diens
           voor- en achternaam.
-        geslachtsaanduiding (GeslachtsaanduidingEnum[0..1]): Geslachtsaanduiding van de
+        geslachtsaanduiding (Geslachtsaanduiding[0..1]): Geslachtsaanduiding van de
           persoon.
         functie (BegripGegevens[0..1]): De functie of het ambt van de persoon.
         nevenfunctie (NevenfunctieGegevens[0..*]): Gegevens over een nevenfunctie van
@@ -519,9 +519,9 @@ class StemmingGegevens(Serializable):
         ID (str[1..*]): Uniek identificatiekenmerk van de stemming.
         heeftBetrekkingOpAgendapunt (VerwijzingGegevens[1..1]): Verwijzing naar het
           agendapunt waarover gestemd werd.
-        type (StemmingTypeEnum[0..1]): De wijze waarop gestemd is.
-        resultaatMondelingeStemming (ResultaatMondelingeStemmingEnum[0..1]): Het
-          resultaat van een mondelinge stemming.
+        type (Stemmingstype[0..1]): De wijze waarop gestemd is.
+        resultaatMondelingeStemming (ResultaatMondelingeStemming[0..1]): Het resultaat
+          van een mondelinge stemming.
         resultaatStemmingOverPersonen (str[0..1]): Beschrijving van het resultaat van
           een stemming over een of meerdere personen.
         stemmingOverPersonen (StemmingOverPersonenGegevens[0..*]): Gegevens die een
@@ -583,7 +583,7 @@ class TijdsaanduidingGegevens(Serializable):
         """Convert integer values in `aanvang` and `einde` to hh:mm:ss timestamps.
 
         Raises:
-            TypeError: `aanvang` or `einde` contains a non-integer type
+            TypeError: `aanvang` or `einde` contains non-integer type
         """
         self.aanvang = helpers.integer_to_timestamp(self.aanvang)
 
@@ -633,7 +633,7 @@ class VergaderingGegevens(Serializable):
         weblocatie (str[0..*]): Actuele link naar een online raadpleeglocatie waar de
           vergadering in zijn geheel wordt getoond, zoals de publicatieomgeving van een
           e-depot of raadsinformatiesysteem.
-        status (VergaderingStatusEnum[0..1]): De status van de vergadering.
+        status (VergaderingStatus[0..1]): De status van de vergadering.
         overheidsorgaan (BegripGegevens[0..1]): Het overheidsorgaan dat de vergadering
           heeft gehouden.
         isVastgelegdMiddels (InformatieobjectGegevens[0..*]): Gegevens over een
